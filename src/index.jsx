@@ -1,6 +1,6 @@
   import { StrictMode } from "react";
   import { createRoot } from "react-dom/client";
-  import App from "./screens/Page";
+  // import App from "./screens/Page";
   import AboutPage from './routes/AboutUsPage';  
   import CaseStudiesPage from './routes/CaseStudiesPage';  
   import ContactPage from './routes/ContactPage';  
