@@ -1,0 +1,48 @@
+{
+  "nodes": [
+    {
+      "id": "src/routes/Homepage.jsx",
+      "label": "Homepage",
+      "routes": [
+        "/"
+      ],
+      "isRoot": true
+    },
+    {
+      "id": "src/routes/AboutUsPage.jsx",
+      "label": "AboutUsPage",
+      "routes": [
+        "/about"
+      ]
+    },
+    {
+      "id": "src/routes/ServicesPage.jsx",
+      "label": "ServicesPage",
+      "routes": [
+        "/services"
+      ]
+    },
+    {
+      "id": "src/routes/CaseStudiesPage.jsx",
+      "label": "CaseStudiesPage",
+      "routes": [
+        "/case-studies"
+      ]
+    },
+    {
+      "id": "src/routes/ResourcesPage.jsx",
+      "label": "ResourcesPage",
+      "routes": [
+        "/resources"
+      ]
+    },
+    {
+      "id": "src/routes/ContactPage.jsx",
+      "label": "ContactPage",
+      "routes": [
+        "/contact"
+      ]
+    }
+  ],
+  "edges": []
+}
