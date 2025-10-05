@@ -60,6 +60,22 @@
   ],
   "edges": [
     {
+      "id": "src/screens/SignInPage.jsx:67:8-to-src/routes/Dashborad.jsx",
+      "source": "src/screens/SignInPage.jsx",
+      "target": "src/routes/Dashborad.jsx",
+      "data": {
+        "viaRoute": "/admindashboard",
+        "trigger": {
+          "element": "navigate(\"/admindashboard\")",
+          "line": 67,
+          "endLine": 67,
+          "column": 8,
+          "endColumn": 35,
+          "sourceFile": "src/screens/SignInPage.jsx"
+        }
+      }
+    },
+    {
       "id": "src/component/Navigation.jsx:27:10-to-src/routes/Homepage.jsx",
       "source": "src/routes/Homepage.jsx",
       "target": "src/routes/Homepage.jsx",
