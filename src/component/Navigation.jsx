@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
+import { BrainCircuit } from "lucide-react";
 import {
   Menu,
   X,
@@ -25,9 +26,11 @@ const Navigation = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex-shrink-0 cursor-pointer"
+            className="flex-shrink-0 cursor-pointer flex items-center gap-2"
           >
-            <h1 className="text-xl font-bold text-gray-900">
+ <div className="bg-blue-600 rounded-2xl p-1 mb-1">
+              <BrainCircuit className="w-8 h-8 text-white" strokeWidth={1} />
+            </div>            <h1 className="text-xl font-bold text-gray-900">
               Core Implementations
             </h1>
           </Link>

@@ -9,6 +9,7 @@ import {
   Users,
   TrendingUp,
   MapPin,
+  BrainCircuit
 } from "lucide-react";
 import Footer from "../component/Footer";
 import  Navigation  from "../component/Navigation";
