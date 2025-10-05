@@ -25,7 +25,7 @@ const Homepage = () => {
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-          <div  
+          <div
             className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"
             style={{ animationDelay: "1s" }}
           ></div>
@@ -43,9 +43,9 @@ const Homepage = () => {
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                   Streamline <br /> Your Business with{" "}
                   <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                    AI     
-                  </span>    
-                </h1> 
+                    AI
+                  </span>
+                </h1>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto font-normal">
                   We help Texas SMBs unlock AI automation for efficiency and
                   growth. Transform your operations with intelligent solutions
@@ -251,13 +251,12 @@ const Homepage = () => {
       {/* Key Services Snapshot */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-
           <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"> 
-              Our Core   </span>  
-              {" "} Services
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Our Core{" "}
+              </span>{" "}
+              Services
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Comprehensive AI solutions tailored for small and medium
@@ -527,7 +526,6 @@ const Homepage = () => {
                 </blockquote>
                 <div className="flex items-center">
                   <div className="relative">
-                
                     <div className="relative w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mr-4 shadow-lg ">
                       <span className="text-white font-bold text-xl">RC</span>
                     </div>

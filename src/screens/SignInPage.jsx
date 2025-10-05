@@ -62,7 +62,10 @@ const SignInPage = () => {
 
     try {
       // Check for super admin credentials
-      if (formData.email === "superadmin@gmail.com" && formData.password === "admin") {
+      if (
+        formData.email === "superadmin@gmail.com" &&
+        formData.password === "admin"
+      ) {
         // Navigate to admin dashboard
         navigate("/admindashboard");
         return;
@@ -94,32 +97,56 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+          style={{ animationDelay: "0.5s" }}
+        ></div>
+      </div>
+
+      <div className="relative max-w-md w-full">
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <div
             onClick={handleHomeClick}
-            className="inline-flex flex-row gap-2 items-center cursor-pointer hover:opacity-80 transition-opacity"
+            className="inline-flex flex-row items-center cursor-pointer group"
           >
-            <div className="bg-blue-600 rounded-2xl p-1 mb-2">
-              <BrainCircuit className="w-8 h-8 text-white" strokeWidth={1} />
+            <div className="relative mb-4">
+              {/* Animated gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-3 transform group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                <BrainCircuit
+                  className="w-10 h-10 text-white"
+                  strokeWidth={1.5}
+                />
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className=" text-3xl  font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent  ml-5 ">
               Core Implementations
             </h1>
           </div>
-          <p className="text-gray-600 text-lg">Sign in to your admin account.</p>
+          <p className="text-gray-700 text-lg  ">
+            Sign in to your admin account
+          </p>
         </div>
 
         {/* Sign In Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-gray-200">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Global Error Message */}
             {errors.submit && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
+              <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 flex items-start animate-shake">
                 <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" />
-                <p className="text-sm text-red-800">{errors.submit}</p>
+                <p className="text-sm text-red-800 font-medium">
+                  {errors.submit}
+                </p>
               </div>
             )}
 
@@ -127,13 +154,13 @@ const SignInPage = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-bold text-gray-700 mb-2"
               >
                 Email Address
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                 </div>
                 <input
                   id="email"
@@ -142,14 +169,19 @@ const SignInPage = () => {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-3 py-3 border ${
-                    errors.email ? "border-red-300" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                  className={`block w-full pl-12 pr-4 py-3.5 border ${
+                    errors.email
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  } rounded-xl focus:ring-2 transition-all shadow-sm hover:shadow-md`}
                   placeholder="admin@coreimplementations.com"
                 />
               </div>
               {errors.email && (
-                <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-2 text-sm text-red-600 flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.email}
+                </p>
               )}
             </div>
 
@@ -157,13 +189,13 @@ const SignInPage = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-bold text-gray-700 mb-2"
               >
                 Password
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                 </div>
                 <input
                   id="password"
@@ -172,37 +204,41 @@ const SignInPage = () => {
                   autoComplete="current-password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-10 py-3 border ${
-                    errors.password ? "border-red-300" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                  className={`block w-full pl-12 pr-12 py-3.5 border ${
+                    errors.password
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  } rounded-xl focus:ring-2 transition-all shadow-sm hover:shadow-md`}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center hover:scale-110 transition-transform"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-2 text-sm text-red-600 flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.password}
+                </p>
               )}
             </div>
 
-            
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white transition-all ${
+              className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white transition-all ${
                 isLoading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:scale-[1.02]"
+                  ? "bg-gradient-to-r from-blue-400 to-indigo-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0"
               }`}
             >
               {isLoading ? (
@@ -230,19 +266,34 @@ const SignInPage = () => {
                   Signing in...
                 </div>
               ) : (
-                "Sign In"
+                <>
+                  Sign In
+                  <svg
+                    className="w-5 h-5 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </>
               )}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="mt-6">
+          <div className="mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-4 bg-white text-gray-600 font-semibold">
                   New to Core Implementations?
                 </span>
               </div>
