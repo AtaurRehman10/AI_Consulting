@@ -8,6 +8,7 @@
   import ResourcesPage from './routes/ResourcesPage';  
   import ServicesPage from './routes/ServicesPage';  
   import AdminDashboard from './routes/Dashborad';
+  import ScrollToTop from './component/ScrollToTop';
 
 
   import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -15,6 +16,7 @@
   createRoot(document.getElementById("app")).render(
     <StrictMode>  
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path="/admin-core-0004" element={<SignInPage />} />
           <Route path="/admindashboard" element={<AdminDashboard />} />

@@ -49,8 +49,8 @@ const AdminDashboard = () => {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Sample data structure matching backend
@@ -421,11 +421,12 @@ const AdminDashboard = () => {
   // Contacts Tab
   const ContactsTab = () => {
     // Filter contacts based on search term
-    const filteredContacts = dashboardData.recentContacts.filter((contact) =>
-      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.projectType.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredContacts = dashboardData.recentContacts.filter(
+      (contact) =>
+        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.projectType.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -539,7 +540,10 @@ const AdminDashboard = () => {
           {/* Mobile/Tablet Card View */}
           <div className="md:hidden divide-y divide-gray-100">
             {filteredContacts.map((contact) => (
-              <div key={contact._id} className="p-4 hover:bg-gray-50 transition-colors">
+              <div
+                key={contact._id}
+                className="p-4 hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-semibold text-gray-900 truncate">
@@ -568,13 +572,17 @@ const AdminDashboard = () => {
 
                   <div className="flex items-center text-sm">
                     <Tag className="w-3.5 h-3.5 mr-2 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-700 capitalize">{contact.projectType}</span>
+                    <span className="text-gray-700 capitalize">
+                      {contact.projectType}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center text-sm text-gray-500">
                       <Calendar className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
-                      <span>{new Date(contact.createdAt).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(contact.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
 
                     <span
