@@ -60,15 +60,15 @@
   ],
   "edges": [
     {
-      "id": "src/screens/SignInPage.jsx:67:8-to-src/routes/Dashborad.jsx",
+      "id": "src/screens/SignInPage.jsx:70:8-to-src/routes/Dashborad.jsx",
       "source": "src/screens/SignInPage.jsx",
       "target": "src/routes/Dashborad.jsx",
       "data": {
         "viaRoute": "/admindashboard",
         "trigger": {
           "element": "navigate(\"/admindashboard\")",
-          "line": 67,
-          "endLine": 67,
+          "line": 70,
+          "endLine": 70,
           "column": 8,
           "endColumn": 35,
           "sourceFile": "src/screens/SignInPage.jsx"
