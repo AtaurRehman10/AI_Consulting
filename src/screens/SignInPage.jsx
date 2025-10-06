@@ -6,9 +6,9 @@ import {
   EyeOff,
   AlertCircle,
   BrainCircuit,
-  Bot,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import useAuth
 
 const SignInPage = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,13 @@ const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signin } = useAuth(); // Use the signin function from context
+
+  // Get the page they were trying to access (if any)
+  const from = location.state?.from?.pathname || "/admindashboard";
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -61,18 +67,15 @@ const SignInPage = () => {
     setIsLoading(true);
 
     try {
-      // Check for super admin credentials
-      if (
-        formData.email === "superadmin@gmail.com" &&
-        formData.password === "admin"
-      ) {
-        // Navigate to admin dashboard
-        navigate("/admindashboard");
-        return;
-      }
+      // Use the signin function from AuthContext
+      const success = signin(formData.email, formData.password);
 
-      // For other credentials, show error (you can modify this for actual API call)
-      setErrors({ submit: "Invalid email or password. Please try again." });
+      if (success) {
+        // Navigate to the page they were trying to access or dashboard
+        navigate(from, { replace: true });
+      } else {
+        setErrors({ submit: "Invalid email or password. Please try again." });
+      }
     } catch (error) {
       setErrors({ submit: "Invalid email or password. Please try again." });
     } finally {
@@ -82,18 +85,6 @@ const SignInPage = () => {
 
   const handleHomeClick = () => {
     window.location.href = "/";
-  };
-
-  const handleSignUpClick = () => {
-    window.location.href = "/admin-core-0004";
-  };
-
-  const handleForgotPasswordClick = () => {
-    window.location.href = "/forgot-password";
-  };
-
-  const handleContactClick = () => {
-    window.location.href = "/contact";
   };
 
   return (
@@ -119,7 +110,6 @@ const SignInPage = () => {
             className="inline-flex flex-row items-center cursor-pointer group"
           >
             <div className="relative mb-4">
-              {/* Animated gradient background */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
               <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-3 transform group-hover:scale-110 transition-transform duration-300 shadow-xl">
                 <BrainCircuit
@@ -128,13 +118,11 @@ const SignInPage = () => {
                 />
               </div>
             </div>
-            <h1 className=" text-3xl  font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent  ml-5 ">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent ml-5">
               Core Implementations
             </h1>
           </div>
-          <p className="text-gray-700 text-lg  ">
-            Sign in to your admin account
-          </p>
+          <p className="text-gray-700 text-lg">Sign in to your admin account</p>
         </div>
 
         {/* Sign In Form */}

@@ -8,8 +8,8 @@
       ]
     },
     {
-      "id": "src/routes/Dashborad.jsx",
-      "label": "Dashborad",
+      "id": "src/component/ProtectedRoute.jsx",
+      "label": "ProtectedRoute",
       "routes": [
         "/admindashboard"
       ]
@@ -60,18 +60,18 @@
   ],
   "edges": [
     {
-      "id": "src/screens/SignInPage.jsx:70:8-to-src/routes/Dashborad.jsx",
-      "source": "src/screens/SignInPage.jsx",
-      "target": "src/routes/Dashborad.jsx",
+      "id": "src/component/ProtectedRoute.jsx:25:11-to-src/screens/SignInPage.jsx",
+      "source": "src/component/ProtectedRoute.jsx",
+      "target": "src/screens/SignInPage.jsx",
       "data": {
-        "viaRoute": "/admindashboard",
+        "viaRoute": "/admin-core-0004",
         "trigger": {
-          "element": "navigate(\"/admindashboard\")",
-          "line": 70,
-          "endLine": 70,
-          "column": 8,
-          "endColumn": 35,
-          "sourceFile": "src/screens/SignInPage.jsx"
+          "element": "<Navigate to=\"/admin-core-0004\" state={{ from: location }} replace />",
+          "line": 25,
+          "endLine": 25,
+          "column": 11,
+          "endColumn": 80,
+          "sourceFile": "src/component/ProtectedRoute.jsx"
         }
       }
     },

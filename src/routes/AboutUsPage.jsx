@@ -9,9 +9,8 @@ import {
   LinkedinIcon,
 } from "lucide-react";
 import Footer from "../component/Footer";
-import  Navigation  from "../component/Navigation";
+import Navigation from "../component/Navigation";
 import Action from "../component/Action";
-   
 
 // About Us Page Component
 const AboutPage = () => {
@@ -19,50 +18,61 @@ const AboutPage = () => {
     <div className="pt-16">
       <Navigation />
       {/* Hero Section */}
-<section className="relative min-h-[92vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 flex items-center overflow-hidden">
-  {/* Decorative Elements */}
-  <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-    <div className="absolute top-10 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
-    <div className="absolute top-40 right-20 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-    <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse" style={{ animationDelay: '1s' }}></div>
-    <div className="absolute bottom-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-  </div>
-  
-  {/* Gradient Overlay for depth */}
-  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/30 pointer-events-none"></div>
-  
-  <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    {/* Badge */}
-    <div className="inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-blue-200 mb-8">
-      <span className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></span>
-      <span className="text-sm font-medium text-gray-800">Empowering Small Businesses</span>
-    </div>
-    
-    {/* Main Heading */}
-    <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
-      Why Core Implementations{' '}
-      <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-        Exists
-      </span>
-    </h1>
-    
-    {/* Subheading */}
-    <p className="text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8">
-      Bridging the gap between enterprise AI capabilities and small
-      business accessibility
-    </p>
-    
-    {/* Optional CTA Buttons */}
-    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-      <button className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-        Learn More
-      </button>
-      <button className="px-8 py-3 bg-white/90 backdrop-blur-sm text-gray-800 rounded-lg font-semibold hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-300">
-        Get Started
-      </button>
-    </div>
-  </div>
-</section>
+      <section className="relative min-h-[92vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 flex items-center overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
+          <div
+            className="absolute top-40 right-20 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
+            style={{ animationDelay: "0.5s" }}
+          ></div>
+          <div
+            className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
+            style={{ animationDelay: "1s" }}
+          ></div>
+          <div
+            className="absolute bottom-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"
+            style={{ animationDelay: "1.5s" }}
+          ></div>
+        </div>
+
+        {/* Gradient Overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/30 pointer-events-none"></div>
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-blue-200 mb-8">
+            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></span>
+            <span className="text-sm font-medium text-gray-800">
+              Empowering Small Businesses
+            </span>
+          </div>
+
+          {/* Main Heading */}
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
+            Why Core Implementations{" "}
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Exists
+            </span>
+          </h1>
+
+          {/* Subheading */}
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8">
+            Bridging the gap between enterprise AI capabilities and small
+            business accessibility
+          </p>
+
+          {/* Optional CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+              Learn More
+            </button>
+            <button className="px-8 py-3 bg-white/90 backdrop-blur-sm text-gray-800 rounded-lg font-semibold hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-300">
+              Get Started
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Company Story */}
       <section className="py-20">
