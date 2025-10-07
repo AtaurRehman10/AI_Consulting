@@ -10,18 +10,18 @@ import {
   Clock,
   X,
 } from "lucide-react";
-import { 
-  getAllContactSubmissions, 
-  updateContactStatus, 
-  deleteContactSubmission 
-} from '../service/contactService';
+import {
+  getAllContactSubmissions,
+  updateContactStatus,
+  deleteContactSubmission,
+} from "../service/contactService";
 
 const ContactSubmissionsTab = () => {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
     loadSubmissions();
@@ -33,8 +33,8 @@ const ContactSubmissionsTab = () => {
       const data = await getAllContactSubmissions();
       setSubmissions(data);
     } catch (error) {
-      console.error('Error loading submissions:', error);
-      alert('Failed to load contact submissions. Please refresh the page.');
+      console.error("Error loading submissions:", error);
+      alert("Failed to load contact submissions. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -44,22 +44,22 @@ const ContactSubmissionsTab = () => {
     try {
       await updateContactStatus(id, newStatus);
       await loadSubmissions();
-      alert('Status updated successfully!');
+      alert("Status updated successfully!");
     } catch (error) {
-      console.error('Error updating status:', error);
-      alert('Failed to update status. Please try again.');
+      console.error("Error updating status:", error);
+      alert("Failed to update status. Please try again.");
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this submission?')) {
+    if (window.confirm("Are you sure you want to delete this submission?")) {
       try {
         await deleteContactSubmission(id);
         await loadSubmissions();
-        alert('Submission deleted successfully!');
+        alert("Submission deleted successfully!");
       } catch (error) {
-        console.error('Error deleting submission:', error);
-        alert('Failed to delete submission. Please try again.');
+        console.error("Error deleting submission:", error);
+        alert("Failed to delete submission. Please try again.");
       }
     }
   };
@@ -71,20 +71,21 @@ const ContactSubmissionsTab = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'new':
-        return 'bg-blue-100 text-blue-700';
-      case 'contacted':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'completed':
-        return 'bg-green-100 text-green-700';
+      case "new":
+        return "bg-blue-100 text-blue-700";
+      case "contacted":
+        return "bg-yellow-100 text-yellow-700";
+      case "completed":
+        return "bg-green-100 text-green-700";
       default:
-        return 'bg-gray-100 text-gray-700';
+        return "bg-gray-100 text-gray-700";
     }
   };
 
-  const filteredSubmissions = filterStatus === 'all' 
-    ? submissions 
-    : submissions.filter(s => s.status === filterStatus);
+  const filteredSubmissions =
+    filterStatus === "all"
+      ? submissions
+      : submissions.filter((s) => s.status === filterStatus);
 
   if (loading) {
     return (
@@ -196,30 +197,34 @@ const ContactSubmissionsTab = () => {
               <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                 <div className="flex items-center text-xs text-gray-500">
                   <Clock className="w-3.5 h-3.5 mr-1.5" />
-                  {submission.createdAt?.toDate ? 
-                    new Date(submission.createdAt.toDate()).toLocaleString() : 
-                    'Just now'}
+                  {submission.createdAt?.toDate
+                    ? new Date(submission.createdAt.toDate()).toLocaleString()
+                    : "Just now"}
                 </div>
                 <div className="flex gap-2">
-                  {submission.status === 'new' && (
+                  {submission.status === "new" && (
                     <button
-                      onClick={() => handleStatusChange(submission.id, 'contacted')}
+                      onClick={() =>
+                        handleStatusChange(submission.id, "contacted")
+                      }
                       className="px-4 py-2 bg-yellow-100 text-yellow-700 text-sm font-medium rounded-lg hover:bg-yellow-200 transition-colors"
                     >
                       Mark as Contacted
                     </button>
                   )}
-                  {submission.status === 'contacted' && (
+                  {submission.status === "contacted" && (
                     <button
-                      onClick={() => handleStatusChange(submission.id, 'completed')}
+                      onClick={() =>
+                        handleStatusChange(submission.id, "completed")
+                      }
                       className="px-4 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg hover:bg-green-200 transition-colors"
                     >
                       Mark as Completed
                     </button>
                   )}
-                  {submission.status === 'completed' && (
+                  {submission.status === "completed" && (
                     <button
-                      onClick={() => handleStatusChange(submission.id, 'new')}
+                      onClick={() => handleStatusChange(submission.id, "new")}
                       className="px-4 py-2 bg-blue-100 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-200 transition-colors"
                     >
                       Reopen
@@ -344,9 +349,11 @@ const ContactSubmissionsTab = () => {
                   Submitted
                 </label>
                 <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">
-                  {selectedSubmission.createdAt?.toDate ? 
-                    new Date(selectedSubmission.createdAt.toDate()).toLocaleString() : 
-                    'Just now'}
+                  {selectedSubmission.createdAt?.toDate
+                    ? new Date(
+                        selectedSubmission.createdAt.toDate()
+                      ).toLocaleString()
+                    : "Just now"}
                 </div>
               </div>
 
@@ -358,19 +365,23 @@ const ContactSubmissionsTab = () => {
                 >
                   Close
                 </button>
-                {selectedSubmission.status !== 'completed' && (
+                {selectedSubmission.status !== "completed" && (
                   <button
                     onClick={() => {
                       handleStatusChange(
                         selectedSubmission.id,
-                        selectedSubmission.status === 'new' ? 'contacted' : 'completed'
+                        selectedSubmission.status === "new"
+                          ? "contacted"
+                          : "completed"
                       );
                       setShowModal(false);
                     }}
                     className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
                   >
                     <CheckCircle className="w-5 h-5" />
-                    {selectedSubmission.status === 'new' ? 'Mark as Contacted' : 'Mark as Completed'}
+                    {selectedSubmission.status === "new"
+                      ? "Mark as Contacted"
+                      : "Mark as Completed"}
                   </button>
                 )}
               </div>

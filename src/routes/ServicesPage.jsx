@@ -1,21 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
+  Brain,
+  Sparkles,
   Target,
-  Cog,
-  BarChart3,
-  Cpu,
+  Rocket,
+  Lightbulb,
+  Zap,
   CheckCircle,
-  ArrowRight,
 } from "lucide-react";
+import { getAllServices } from "../service/serviceService";
 import Footer from "../component/Footer";
 import Navigation from "../component/Navigation";
 import Action from "../component/Action";
 
 // Services Page Component
 const ServicesPage = () => {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Icon mapping
+  const iconMap = {
+    brain: Brain,
+    sparkles: Sparkles,
+    target: Target,
+    rocket: Rocket,
+    lightbulb: Lightbulb,
+    zap: Zap,
+  };
+
+  // Color schemes for different services
+  const colorSchemes = [
+    { bg: "bg-blue-100", text: "text-blue-600", section: "" },
+    { bg: "bg-green-100", text: "text-green-600", section: "bg-gray-50" },
+    { bg: "bg-purple-100", text: "text-purple-600", section: "" },
+    { bg: "bg-orange-100", text: "text-orange-600", section: "bg-gray-50" },
+    { bg: "bg-indigo-100", text: "text-indigo-600", section: "" },
+    { bg: "bg-pink-100", text: "text-pink-600", section: "bg-gray-50" },
+  ];
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    try {
+      setLoading(true);
+      const servicesData = await getAllServices();
+      setServices(servicesData);
+    } catch (error) {
+      console.error("Error loading services:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIconComponent = (logoId) => {
+    return iconMap[logoId] || Target;
+  };
+
   return (
     <div className="pt-16">
       <Navigation />
+
       {/* Hero Section */}
       <section className="relative min-h-[92vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 py-24 overflow-hidden">
         {/* Decorative Elements */}
@@ -73,376 +119,185 @@ const ServicesPage = () => {
         </div>
       </section>
 
-      {/* AI Strategy & Roadmaps */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="bg-blue-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Target className="w-8 h-8 text-blue-600" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                AI Strategy & Roadmaps
-              </h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    The Problem
-                  </h3>
-                  <p className="text-gray-600">
-                    Many SMBs don't know where to start with AI. The technology
-                    landscape is complex, and it's unclear which solutions will
-                    provide real value for your specific business needs.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Our Solution
-                  </h3>
-                  <p className="text-gray-600">
-                    We provide comprehensive discovery sessions and adoption
-                    planning tailored to your business. Our structured approach
-                    identifies high-impact opportunities and creates a clear
-                    implementation roadmap.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    What You Get
-                  </h3>
-                  <ul className="space-y-2 text-gray-600">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Detailed strategy document with prioritized AI
-                      opportunities
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Implementation timeline with clear milestones
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      ROI projections and budget planning
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Technology recommendations and vendor evaluation
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <button className="mt-8 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Schedule Strategy Session
-              </button>
-            </div>
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8">
-              <div className="space-y-4">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-semibold text-gray-900 mb-2">
-                    Phase 1: Discovery
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Business process analysis and opportunity identification
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-semibold text-gray-900 mb-2">
-                    Phase 2: Strategy
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    AI roadmap development and ROI modeling
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-semibold text-gray-900 mb-2">
-                    Phase 3: Planning
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Implementation timeline and resource allocation
-                  </p>
-                </div>
-              </div>
-            </div>
+      {/* Dynamic Services Sections */}
+      {loading ? (
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading services...</p>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : services.length === 0 ? (
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p className="text-gray-500 text-lg">
+              No services available at the moment.
+            </p>
+          </div>
+        </section>
+      ) : (
+        services.map((service, index) => {
+          const IconComponent = getIconComponent(service.logoId);
+          const colorScheme = colorSchemes[index % colorSchemes.length];
+          const isEven = index % 2 === 0;
 
-      {/* Process Automation */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8">
-              <div className="space-y-4">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">
-                      Manual Process
-                    </span>
-                    <span className="text-xs text-red-600">8 hours</span>
+          return (
+            <section
+              key={service.id}
+              className={`py-20 ${colorScheme.section}`}
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                  className={`grid lg:grid-cols-2 gap-12 items-center ${
+                    !isEven ? "lg:flex-row-reverse" : ""
+                  }`}
+                >
+                  {/* Content Side */}
+                  <div className={isEven ? "order-1" : "order-1 lg:order-2"}>
+                    <div
+                      className={`${colorScheme.bg} w-16 h-16 rounded-lg flex items-center justify-center mb-6 shadow-lg transform hover:scale-110 transition-transform`}
+                    >
+                      <IconComponent
+                        className={`w-8 h-8 ${colorScheme.text}`}
+                      />
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                      {service.name}
+                    </h2>
+                    <div className="space-y-6">
+                      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                          The Problem
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {service.problem}
+                        </p>
+                      </div>
+                      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                          Our Solution
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {service.solution}
+                        </p>
+                      </div>
+                      <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                          <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                          What You Get
+                        </h3>
+                        <ul className="space-y-3 text-gray-600">
+                          {service.points.map((point, idx) => (
+                            <li key={idx} className="flex items-start group">
+                              <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                              <span className="leading-relaxed">{point}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-full bg-red-100 rounded-full h-2 mt-2">
-                    <div className="bg-red-500 h-2 rounded-full w-full"></div>
-                  </div>
-                </div>
-                <ArrowRight className="w-6 h-6 text-gray-400 mx-auto" />
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">
-                      Automated Process
-                    </span>
-                    <span className="text-xs text-green-600">30 minutes</span>
-                  </div>
-                  <div className="w-full bg-green-100 rounded-full h-2 mt-2">
-                    <div className="bg-green-500 h-2 rounded-full w-1/4"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="bg-green-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Cog className="w-8 h-8 text-green-600" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Process Automation
-              </h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    The Problem
-                  </h3>
-                  <p className="text-gray-600">
-                    Manual processes waste time and create errors. Your team
-                    spends hours on repetitive tasks that could be automated,
-                    reducing productivity and increasing frustration.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Our Solution
-                  </h3>
-                  <p className="text-gray-600">
-                    RPA, workflow optimization, and ERP enhancements that
-                    eliminate manual work. We integrate seamlessly with your
-                    existing systems to create smooth, automated processes.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    What You Get
-                  </h3>
-                  <ul className="space-y-2 text-gray-600">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Automated workflows that save 60-80% of processing time
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Integrated systems that eliminate data silos
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Comprehensive training for your team
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Ongoing support and optimization
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <button className="mt-8 bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                Automate Your Processes
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Data & Insights */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="bg-purple-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <BarChart3 className="w-8 h-8 text-purple-600" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Data & Insights
-              </h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    The Problem
-                  </h3>
-                  <p className="text-gray-600">
-                    Business data is scattered and hard to interpret. Important
-                    insights are buried in spreadsheets, making it difficult to
-                    make informed decisions quickly.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Our Solution
-                  </h3>
-                  <p className="text-gray-600">
-                    Custom dashboards, reporting, and predictive models that
-                    turn your data into actionable insights. Real-time
-                    visibility into your business performance.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    What You Get
-                  </h3>
-                  <ul className="space-y-2 text-gray-600">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Real-time dashboards accessible from anywhere
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Automated reports delivered to your inbox
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Predictive analytics for better planning
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Data integration from multiple sources
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <button className="mt-8 bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                See Your Data Clearly
-              </button>
-            </div>
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8">
-              <div className="bg-white rounded-lg p-6 shadow-lg">
-                <h3 className="font-semibold text-gray-900 mb-4">
-                  Business Performance Dashboard
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Monthly Revenue
-                    </span>
-                    <span className="text-sm font-semibold text-green-600">
-                      +23%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Customer Acquisition
-                    </span>
-                    <span className="text-sm font-semibold text-blue-600">
-                      +15%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Process Efficiency
-                    </span>
-                    <span className="text-sm font-semibold text-purple-600">
-                      +67%
-                    </span>
-                  </div>
-                  <div className="mt-4 p-3 bg-gray-50 rounded">
-                    <span className="text-xs text-gray-500">
-                      Next Month Prediction: Revenue +18%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                  {/* Visual Side */}
+                  <div
+                    className={`${
+                      isEven ? "order-2" : "order-2 lg:order-1"
+                    } relative`}
+                  >
+                    <div className="relative h-full min-h-[400px] lg:min-h-[600px]">
+                      {/* Decorative Background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl transform rotate-3"></div>
 
-      {/* Custom AI Solutions */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <Cpu className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-600">Custom Chatbot</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <BarChart3 className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-600">Predictive Models</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <Cog className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-600">Workflow Engine</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <Target className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-600">Smart Recommendations</p>
+                      {/* Main Card */}
+                      <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+                        <div className="space-y-6">
+                          {/* Large Icon Display */}
+                          <div
+                            className={`${colorScheme.bg} w-24 h-24 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-lg`}
+                          >
+                            <IconComponent
+                              className={`w-16 h-16 ${colorScheme.text}`}
+                            />
+                          </div>
+
+                          {/* Stats Cards */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+                              <div className="text-3xl font-bold text-blue-600 mb-1">
+                                Fast
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                Implementation
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                              <div className="text-3xl font-bold text-green-600 mb-1">
+                                ROI
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                Focused
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-100">
+                              <div className="text-3xl font-bold text-purple-600 mb-1">
+                                24/7
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                Support
+                              </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-4 rounded-xl border border-orange-100">
+                              <div className="text-3xl font-bold text-orange-600 mb-1">
+                                100%
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                Custom
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Feature Highlights */}
+                          <div className="space-y-3 pt-4">
+                            <div className="flex items-center bg-gray-50 p-3 rounded-lg">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                              <span className="text-sm font-medium text-gray-700">
+                                Scalable Solutions
+                              </span>
+                            </div>
+                            <div className="flex items-center bg-gray-50 p-3 rounded-lg">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                              <span className="text-sm font-medium text-gray-700">
+                                Expert Team
+                              </span>
+                            </div>
+                            <div className="flex items-center bg-gray-50 p-3 rounded-lg">
+                              <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                              <span className="text-sm font-medium text-gray-700">
+                                Proven Results
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Floating Accent Elements */}
+                      <div
+                        className={`absolute -top-4 -right-4 ${colorScheme.bg} w-20 h-20 rounded-2xl opacity-50 blur-sm`}
+                      ></div>
+                      <div
+                        className={`absolute -bottom-4 -left-4 ${colorScheme.bg} w-16 h-16 rounded-2xl opacity-50 blur-sm`}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                <Cpu className="w-8 h-8 text-orange-600" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Custom AI Solutions
-              </h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    The Problem
-                  </h3>
-                  <p className="text-gray-600">
-                    Off-the-shelf tools don't fit unique business needs. Your
-                    specific processes and requirements need tailored solutions
-                    that work exactly the way you do business.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Our Solution
-                  </h3>
-                  <p className="text-gray-600">
-                    Tailored AI tools for specific use cases. From custom
-                    chatbots to predictive systems, we build solutions that fit
-                    your business like a glove.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    What You Get
-                  </h3>
-                  <ul className="space-y-2 text-gray-600">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Custom software built for your exact needs
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      AI models trained on your specific data
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Ongoing support and feature updates
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                      Full documentation and training
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <button className="mt-8 bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">
-                Build Custom Solutions
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+            </section>
+          );
+        })
+      )}
+
       <Action />
       <Footer />
     </div>

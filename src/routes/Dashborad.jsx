@@ -12,6 +12,7 @@ import {
   Building2,
   Briefcase,
 } from "lucide-react";
+import { getCompanyProfile } from "../service/companyProfileService";
 
 import OverviewTab from "../DashboradPages/Overview";
 import CompanyProfileTab from "../DashboradPages/CompanyProfile";
@@ -22,6 +23,7 @@ import CaseStudiesTab from "../DashboradPages/CaseStudies";
 import ReviewsTab from "../DashboradPages/Reviews";
 
 const AdminDashboard = () => {
+  const [companyName, setCompanyName] = useState("Core Implementations");
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -37,6 +39,21 @@ const AdminDashboard = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Load company name from Firebase
+  useEffect(() => {
+    const loadCompanyName = async () => {
+      try {
+        const profileData = await getCompanyProfile();
+        if (profileData?.companyName) {
+          setCompanyName(profileData.companyName);
+        }
+      } catch (error) {
+        console.error("Error loading company name:", error);
+      }
+    };
+    loadCompanyName();
   }, []);
 
   const Sidebar = () => (
@@ -61,7 +78,7 @@ const AdminDashboard = () => {
               </div>
               <div>
                 <h2 className="font-bold text-gray-900 text-lg">
-                  Core Implem...
+                  {companyName}
                 </h2>
                 <p className="text-xs text-gray-500 font-medium">
                   Admin Dashboard

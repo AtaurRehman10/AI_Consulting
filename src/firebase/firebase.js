@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -10,7 +10,7 @@ const firebaseConfig = {
   storageBucket: "website-44684.firebasestorage.app",
   messagingSenderId: "819313129901",
   appId: "1:819313129901:web:f37497a346e0b1385f4924",
-  measurementId: "G-HG4P7XWR0L"
+  measurementId: "G-HG4P7XWR0L",
 };
 
 // Initialize Firebase

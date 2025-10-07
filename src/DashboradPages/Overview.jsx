@@ -11,9 +11,12 @@ import {
   Building2,
   Tag,
   Briefcase,
-  BookOpen, 
+  BookOpen,
 } from "lucide-react";
-import { getDashboardStats, getRecentContacts } from "../service/overviewService";
+import {
+  getDashboardStats,
+  getRecentContacts,
+} from "../service/overviewService";
 
 const OverviewTab = () => {
   const [loading, setLoading] = useState(true);
@@ -290,7 +293,6 @@ const OverviewTab = () => {
           </>
         )}
       </div>
-
     </div>
   );
 };

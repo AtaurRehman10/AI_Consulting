@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Save } from "lucide-react";
-import { getCompanyProfile, saveCompanyProfile } from "../service/companyProfileService";
+import {
+  getCompanyProfile,
+  saveCompanyProfile,
+} from "../service/companyProfileService";
 
 const CompanyProfileTab = () => {
   const [companyData, setCompanyData] = useState({

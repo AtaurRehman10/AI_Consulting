@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
 import { addContactSubmission } from "../service/contactService";
 import Footer from "../component/Footer";
@@ -18,6 +18,11 @@ const ContactPage = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const contactFormRef = useRef(null);
+
+  const scrollToContactForm = () => {
+    contactFormRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -131,7 +136,10 @@ const ContactPage = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-10">
-            <button className="group px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center">
+            <button
+              onClick={scrollToContactForm}
+              className="group px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center"
+            >
               Schedule Consultation
               <svg
                 className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
@@ -147,7 +155,10 @@ const ContactPage = () => {
                 />
               </svg>
             </button>
-            <button className="px-10 py-4 bg-white/90 backdrop-blur-sm text-gray-800 rounded-xl font-bold text-lg hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-300 transform hover:-translate-y-1">
+            <button
+              onClick={scrollToContactForm}
+              className="px-10 py-4 bg-white/90 backdrop-blur-sm text-gray-800 rounded-xl font-bold text-lg hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-300 transform hover:-translate-y-1"
+            >
               Contact Us
             </button>
           </div>
@@ -201,7 +212,7 @@ const ContactPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="py-20">
+      <section ref={contactFormRef} className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Information */}

@@ -1,78 +1,202 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronRight,
+  Brain,
+  Sparkles,
   Target,
-  Cog,
-  BarChart3,
-  CheckCircle,
-  Download,
-  Calendar,
+  Rocket,
   Lightbulb,
+  Zap,
+  Calendar,
+  Clock,
+  Cog,
+  X,
 } from "lucide-react";
+import { getAllServices } from "../service/serviceService";
+import { getAllBlogs } from "../service/blogService";
 import Footer from "../component/Footer";
 import Navigation from "../component/Navigation";
 import Action from "../component/Action";
 
+// Blog Modal Component
+const BlogModal = ({ blog, onClose }) => {
+  useEffect(() => {
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
+  const getCategoryColor = (category) => {
+    const colors = {
+      "Getting Started": "bg-blue-100 text-blue-800",
+      Strategy: "bg-green-100 text-green-800",
+      Implementation: "bg-purple-100 text-purple-800",
+      "Case Study": "bg-orange-100 text-orange-800",
+      "Industry Insights": "bg-pink-100 text-pink-800",
+      "Best Practices": "bg-indigo-100 text-indigo-800",
+      Technology: "bg-cyan-100 text-cyan-800",
+      Automation: "bg-yellow-100 text-yellow-800",
+    };
+    return colors[category] || "bg-gray-100 text-gray-800";
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+              <div className="flex items-center space-x-3">
+                <span
+                  className={`text-sm font-medium px-3 py-1 rounded-full ${getCategoryColor(
+                    blog.blogType
+                  )}`}
+                >
+                  {blog.blogType}
+                </span>
+                {blog.readTime && (
+                  <span className="text-sm text-gray-500 flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {blog.readTime}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="overflow-y-auto max-h-[calc(90vh-80px)] px-6 py-8">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                {blog.blogName}
+              </h1>
+
+              <div className="flex items-center text-sm text-gray-500 mb-8">
+                <Calendar className="w-4 h-4 mr-1" />
+                {blog.publishDate
+                  ? new Date(blog.publishDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "Recent"}
+              </div>
+
+              <div className="prose prose-lg max-w-none">
+                <p className="text-xl text-gray-700 leading-relaxed mb-6">
+                  {blog.description}
+                </p>
+
+                {blog.content && (
+                  <div
+                    className="text-gray-600 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: blog.content }}
+                  />
+                )}
+
+                {!blog.content && (
+                  <div className="text-gray-600 leading-relaxed space-y-4">
+                    <p>{blog.description}</p>
+                    <p className="italic text-gray-500">
+                      Full content coming soon...
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Resources Page Component
 const ResourcesPage = () => {
-  const blogPosts = [
-    {
-      title: "5 Ways AI Saves Time in Your Business",
-      excerpt:
-        "Discover the most impactful automation opportunities that can immediately reduce manual work and boost productivity.",
-      category: "Getting Started",
-      readTime: "5 min read",
-      date: "March 15, 2024",
-    },
-    {
-      title: "How SMBs Can Compete with Enterprise AI",
-      excerpt:
-        "Learn how small businesses can leverage enterprise-grade AI tools without the enterprise budget or complexity.",
-      category: "Strategy",
-      readTime: "8 min read",
-      date: "March 10, 2024",
-    },
-    {
-      title: "Getting Started: Your First AI Implementation",
-      excerpt:
-        "A step-by-step guide to planning and executing your first AI project with maximum impact and minimal risk.",
-      category: "Implementation",
-      readTime: "12 min read",
-      date: "March 5, 2024",
-    },
-    {
-      title: "ROI Calculator: Measuring AI Success",
-      excerpt:
-        "Framework for calculating and tracking the return on investment from your AI initiatives with real examples.",
-      category: "Strategy",
-      readTime: "10 min read",
-      date: "February 28, 2024",
-    },
+  const [services, setServices] = useState([]);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBlog, setSelectedBlog] = useState(null);
+
+  // Icon mapping
+  const iconMap = {
+    brain: Brain,
+    sparkles: Sparkles,
+    target: Target,
+    rocket: Rocket,
+    lightbulb: Lightbulb,
+    zap: Zap,
+  };
+
+  // Color schemes for services
+  const colorSchemes = [
+    { bg: "bg-blue-100", text: "text-blue-600" },
+    { bg: "bg-green-100", text: "text-green-600" },
+    { bg: "bg-purple-100", text: "text-purple-600" },
+    { bg: "bg-orange-100", text: "text-orange-600" },
   ];
 
-  const leadMagnets = [
-    {
-      title: "SMB AI Readiness Checklist",
-      description:
-        "Comprehensive checklist to assess your business's readiness for AI implementation and identify priority areas.",
-      type: "PDF Guide",
-      icon: <CheckCircle className="w-8 h-8 text-blue-600" />,
-    },
-    {
-      title: "AI Implementation Timeline Template",
-      description:
-        "Step-by-step timeline template for planning and managing your AI project from concept to deployment.",
-      type: "Excel Template",
-      icon: <Calendar className="w-8 h-8 text-green-600" />,
-    },
-    {
-      title: "Cost-Benefit Analysis Worksheet",
-      description:
-        "Financial planning worksheet to calculate ROI, costs, and benefits for your AI initiatives.",
-      type: "Spreadsheet",
-      icon: <BarChart3 className="w-8 h-8 text-purple-600" />,
-    },
-  ];
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [servicesData, blogsData] = await Promise.all([
+        getAllServices(),
+        getAllBlogs(),
+      ]);
+
+      // Get first 4 services for resource categories
+      setServices(servicesData.slice(0, 4));
+      setBlogPosts(blogsData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIconComponent = (logoId) => {
+    return iconMap[logoId] || Target;
+  };
+
+  const getCategoryColor = (category) => {
+    const colors = {
+      "Getting Started": "bg-blue-100 text-blue-800",
+      Strategy: "bg-green-100 text-green-800",
+      Implementation: "bg-purple-100 text-purple-800",
+      "Case Study": "bg-orange-100 text-orange-800",
+      "Industry Insights": "bg-pink-100 text-pink-800",
+      "Best Practices": "bg-indigo-100 text-indigo-800",
+      Technology: "bg-cyan-100 text-cyan-800",
+      Automation: "bg-yellow-100 text-yellow-800",
+    };
+    return colors[category] || "bg-gray-100 text-gray-800";
+  };
+
+  const handleReadMore = (blog) => {
+    setSelectedBlog(blog);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedBlog(null);
+  };
 
   return (
     <div className="pt-16">
@@ -194,47 +318,8 @@ const ResourcesPage = () => {
         </div>
       </section>
 
-      {/* Lead Magnets */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Free Tools & Templates
-            </h2>
-            <p className="text-xl text-gray-600">
-              Download our expert-crafted resources to accelerate your AI
-              journey
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {leadMagnets.map((resource, index) => (
-              <div
-                key={index}
-                className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-              >
-                <div className="bg-gray-100 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                  {resource.icon}
-                </div>
-                <div className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full inline-block mb-4">
-                  {resource.type}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {resource.title}
-                </h3>
-                <p className="text-gray-600 mb-6">{resource.description}</p>
-                <button className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center">
-                  <Download className="w-5 h-5 mr-2" />
-                  Download Free
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Blog Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Blog Section - Dynamic */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -246,39 +331,77 @@ const ResourcesPage = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {blogPosts.map((post, index) => (
-              <article
-                key={index}
-                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                    {post.category}
-                  </span>
-                  <span className="text-sm text-gray-500">{post.readTime}</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 hover:text-blue-600 cursor-pointer transition-colors">
-                  {post.title}
-                </h3>
-                <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">{post.date}</span>
-                  <a
-                    href="#"
-                    className="text-blue-600 font-medium flex items-center hover:text-blue-700 transition-colors"
-                  >
-                    Read More <ChevronRight className="w-4 h-4 ml-1" />
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading blog posts...</p>
+            </div>
+          ) : blogPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">
+                No blog posts available yet.
+              </p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogPosts.map((post) => (
+                <article
+                  key={post.id}
+                  className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all border border-gray-100 group"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span
+                      className={`text-sm font-medium px-3 py-1 rounded-full ${getCategoryColor(
+                        post.blogType
+                      )}`}
+                    >
+                      {post.blogType}
+                    </span>
+                    {post.readTime && (
+                      <span className="text-sm text-gray-500 flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {post.readTime}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 cursor-pointer transition-colors line-clamp-2">
+                    {post.blogName}
+                  </h3>
+
+                  <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+                    {post.description}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <span className="text-sm text-gray-500 flex items-center">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {post.publishDate
+                        ? new Date(post.publishDate).toLocaleDateString()
+                        : "Recent"}
+                    </span>
+                    <button
+                      onClick={() => handleReadMore(post)}
+                      className="text-blue-600 font-medium flex items-center hover:text-blue-700 transition-colors group"
+                    >
+                      Read More
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       <Action />
       <Footer />
+
+      {/* Blog Modal */}
+      {selectedBlog && (
+        <BlogModal blog={selectedBlog} onClose={handleCloseModal} />
+      )}
     </div>
   );
 };

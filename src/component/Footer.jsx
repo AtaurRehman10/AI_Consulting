@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   MapPin,
   Phone,
@@ -10,8 +11,28 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getCompanyProfile } from "../service/companyProfileService";
 
 const Footer = () => {
+  const [companyName, setCompanyName] = useState("Core Implementations");
+
+  // Load company name from Firebase
+  useEffect(() => {
+    const loadCompanyName = async () => {
+      try {
+        const profileData = await getCompanyProfile();
+        if (profileData?.companyName) {
+          setCompanyName(profileData.companyName);
+        }
+      } catch (error) {
+        console.error("Error loading company name:", error);
+      }
+    };
+    loadCompanyName();
+  }, []);
+
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
       {/* Decorative Background Elements */}
@@ -37,7 +58,7 @@ const Footer = () => {
                   />
                 </div>
               </div>
-              <h3 className="text-xl font-bold">Core Implementations</h3>
+              <h3 className="text-xl font-bold">{companyName}</h3>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               AI made simple for SMBs. Transforming Texas businesses with
@@ -79,12 +100,11 @@ const Footer = () => {
             <h4 className="font-bold text-lg mb-6 text-white">Quick Links</h4>
             <div className="space-y-3">
               {[
+                { label: "Home", to: "/" },
                 { label: "Services", to: "/services" },
                 { label: "About Us", to: "/about" },
                 { label: "Case Studies", to: "/case-studies" },
                 { label: "Resources", to: "/resources" },
-                { label: "Privacy Policy", to: "/privacy" },
-                { label: "Terms of Service", to: "/terms" },
               ].map((link) => (
                 <Link
                   key={link.label}
@@ -152,7 +172,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-col md:flex-row items-center gap-4">
               <p className="text-gray-400 text-sm">
-                © 2024 Core Implementations. All rights reserved.
+                © {currentYear} {companyName}. All rights reserved.
               </p>
               <div className="flex items-center gap-4 text-sm">
                 <Link

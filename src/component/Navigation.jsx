@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { BrainCircuit, Menu, X } from "lucide-react";
+import { getCompanyProfile } from "../service/companyProfileService";
 
 // Navigation Component
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [companyName, setCompanyName] = useState("Core Implementations");
+
+  // Load company name from Firebase
+  useEffect(() => {
+    const loadCompanyName = async () => {
+      try {
+        const profileData = await getCompanyProfile();
+        if (profileData?.companyName) {
+          setCompanyName(profileData.companyName);
+        }
+      } catch (error) {
+        console.error("Error loading company name:", error);
+      }
+    };
+    loadCompanyName();
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
@@ -44,14 +61,19 @@ const Navigation = () => {
               {/* Animated gradient background */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
               <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-2 transform group-hover:scale-110 transition-transform duration-300">
-                <BrainCircuit className="w-8 h-8 text-white" strokeWidth={1.5} />
+                <BrainCircuit
+                  className="w-8 h-8 text-white"
+                  strokeWidth={1.5}
+                />
               </div>
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Core Implementations
+                {companyName}
               </h1>
-              <p className="text-xs text-gray-500 font-medium">AI Solutions for SMBs</p>
+              <p className="text-xs text-gray-500 font-medium">
+                AI Solutions for SMBs
+              </p>
             </div>
           </Link>
 
@@ -182,4 +204,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation; 
+export default Navigation;

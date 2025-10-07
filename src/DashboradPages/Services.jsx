@@ -13,7 +13,12 @@ import {
   Lightbulb,
   Zap,
 } from "lucide-react";
-import { getAllServices, addService, updateService, deleteService } from '../service/serviceService';
+import {
+  getAllServices,
+  addService,
+  updateService,
+  deleteService,
+} from "../service/serviceService";
 
 const ServicesTab = () => {
   const [services, setServices] = useState([]);
@@ -27,7 +32,6 @@ const ServicesTab = () => {
     problem: "",
     solution: "",
     points: ["", "", "", ""],
-    image: null,
   });
 
   const logoOptions = [
@@ -50,8 +54,8 @@ const ServicesTab = () => {
       const servicesData = await getAllServices();
       setServices(servicesData);
     } catch (error) {
-      console.error('Error loading services:', error);
-      alert('Failed to load services. Please refresh the page.');
+      console.error("Error loading services:", error);
+      alert("Failed to load services. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -68,7 +72,6 @@ const ServicesTab = () => {
       problem: "",
       solution: "",
       points: ["", "", "", ""],
-      image: null,
     });
     setSelectedLogo("");
     setEditingService(null);
@@ -81,7 +84,6 @@ const ServicesTab = () => {
       problem: service.problem,
       solution: service.solution,
       points: service.points,
-      image: null, // Don't load existing image file
     });
     setSelectedLogo(service.logoId);
     setEditingService(service);
@@ -126,21 +128,6 @@ const ServicesTab = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file size (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File size must be less than 2MB');
-        return;
-      }
-      setServiceForm((prev) => ({
-        ...prev,
-        image: file,
-      }));
-    }
-  };
-
   const handleSaveService = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
@@ -173,16 +160,16 @@ const ServicesTab = () => {
       if (editingService) {
         // Update existing service in Firebase
         await updateService(
-          editingService.id, 
-          serviceData, 
-          serviceForm.image, 
+          editingService.id,
+          serviceData,
+          null,
           editingService.imagePath
         );
-        alert('Service updated successfully!');
+        alert("Service updated successfully!");
       } else {
         // Add new service to Firebase
-        await addService(serviceData, serviceForm.image);
-        alert('Service added successfully!');
+        await addService(serviceData, null);
+        alert("Service added successfully!");
       }
 
       // Reload services from Firebase
@@ -200,7 +187,7 @@ const ServicesTab = () => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
         await deleteService(service.id, service.imagePath);
-        alert('Service deleted successfully!');
+        alert("Service deleted successfully!");
         // Reload services from Firebase
         await loadServices();
       } catch (error) {
@@ -247,7 +234,9 @@ const ServicesTab = () => {
       {/* Services Grid */}
       {services.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
-          <p className="text-gray-500 text-lg">No services yet. Add your first one!</p>
+          <p className="text-gray-500 text-lg">
+            No services yet. Add your first one!
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -277,16 +266,6 @@ const ServicesTab = () => {
                     </button>
                   </div>
                 </div>
-
-                {service.imageUrl && (
-                  <div className="mb-4 rounded-lg overflow-hidden">
-                    <img 
-                      src={service.imageUrl} 
-                      alt={service.name}
-                      className="w-full h-32 object-cover"
-                    />
-                  </div>
-                )}
 
                 <h3 className="font-bold text-lg text-gray-900 mb-2">
                   {service.name}
@@ -463,42 +442,6 @@ const ServicesTab = () => {
                     <Plus className="w-4 h-4" /> Add Another Point
                   </button>
                 </div>
-              </div>
-
-              {/* Image Upload */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Service Image {editingService && '(Upload new to replace)'}
-                </label>
-                <input
-                  type="file"
-                  id="service-image-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-                <label
-                  htmlFor="service-image-upload"
-                  className="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-500 transition-colors cursor-pointer"
-                >
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-sm text-gray-600 font-medium mb-2">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG or WEBP (max. 2MB)
-                  </p>
-                  {serviceForm.image && (
-                    <p className="text-sm text-green-600 font-medium mt-2">
-                      ✓ {serviceForm.image.name}
-                    </p>
-                  )}
-                  {editingService && editingService.imageUrl && !serviceForm.image && (
-                    <p className="text-sm text-blue-600 font-medium mt-2">
-                      Current image will be kept
-                    </p>
-                  )}
-                </label>
               </div>
 
               {/* Action Buttons */}

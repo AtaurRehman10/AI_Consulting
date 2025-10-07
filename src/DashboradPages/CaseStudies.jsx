@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { X, Plus, Edit, Trash2, Save, CheckCircle, Clock } from "lucide-react";
 import {
-  X,
-  Plus,
-  Edit,
-  Trash2,
-  Save,
-  CheckCircle,
-  Clock,
-} from "lucide-react";
-import { getAllCaseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy } from '../service/caseStudyService';
+  getAllCaseStudies,
+  addCaseStudy,
+  updateCaseStudy,
+  deleteCaseStudy,
+} from "../service/caseStudyService";
 
 const CaseStudiesTab = () => {
   const [caseStudies, setCaseStudies] = useState([]);
@@ -50,8 +47,8 @@ const CaseStudiesTab = () => {
       const data = await getAllCaseStudies();
       setCaseStudies(data);
     } catch (error) {
-      console.error('Error loading case studies:', error);
-      alert('Failed to load case studies. Please refresh the page.');
+      console.error("Error loading case studies:", error);
+      alert("Failed to load case studies. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -158,11 +155,11 @@ const CaseStudiesTab = () => {
       if (editingCaseStudy) {
         // Update existing case study in Firebase
         await updateCaseStudy(editingCaseStudy, caseStudyData);
-        alert('Case study updated successfully!');
+        alert("Case study updated successfully!");
       } else {
         // Add new case study to Firebase
         await addCaseStudy(caseStudyData);
-        alert('Case study published successfully!');
+        alert("Case study published successfully!");
       }
 
       // Reload case studies from Firebase
@@ -180,7 +177,7 @@ const CaseStudiesTab = () => {
     if (window.confirm("Are you sure you want to delete this case study?")) {
       try {
         await deleteCaseStudy(id);
-        alert('Case study deleted successfully!');
+        alert("Case study deleted successfully!");
         // Reload case studies from Firebase
         await loadCaseStudies();
       } catch (error) {
@@ -227,7 +224,9 @@ const CaseStudiesTab = () => {
       {/* Case Studies Grid */}
       {caseStudies.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
-          <p className="text-gray-500 text-lg">No case studies yet. Add your first one!</p>
+          <p className="text-gray-500 text-lg">
+            No case studies yet. Add your first one!
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

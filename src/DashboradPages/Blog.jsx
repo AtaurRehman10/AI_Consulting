@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { Calendar, X, Clock, Plus, Edit, Trash2, Save } from "lucide-react";
 import {
-  Calendar,
-  X,
-  Clock,
-  Plus,
-  Edit,
-  Trash2,
-  Save,
-} from "lucide-react";
-import { getAllBlogs, addBlog, updateBlog, deleteBlog } from '../service/blogService';
+  getAllBlogs,
+  addBlog,
+  updateBlog,
+  deleteBlog,
+} from "../service/blogService";
 
 const BlogTab = () => {
   const [showBlogModal, setShowBlogModal] = useState(false);
@@ -47,8 +44,8 @@ const BlogTab = () => {
       const blogs = await getAllBlogs();
       setBlogPosts(blogs);
     } catch (error) {
-      console.error('Error loading blogs:', error);
-      alert('Failed to load blog posts. Please refresh the page.');
+      console.error("Error loading blogs:", error);
+      alert("Failed to load blog posts. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -105,11 +102,11 @@ const BlogTab = () => {
       if (editingBlog) {
         // Update existing blog in Firebase
         await updateBlog(editingBlog, blogForm);
-        alert('Blog post updated successfully!');
+        alert("Blog post updated successfully!");
       } else {
         // Add new blog to Firebase
         await addBlog(blogForm);
-        alert('Blog post published successfully!');
+        alert("Blog post published successfully!");
       }
 
       // Reload blogs from Firebase
@@ -127,7 +124,7 @@ const BlogTab = () => {
     if (window.confirm("Are you sure you want to delete this blog post?")) {
       try {
         await deleteBlog(id);
-        alert('Blog post deleted successfully!');
+        alert("Blog post deleted successfully!");
         // Reload blogs from Firebase
         await loadBlogs();
       } catch (error) {
@@ -174,7 +171,9 @@ const BlogTab = () => {
       {/* Blog Posts Grid */}
       {blogPosts.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
-          <p className="text-gray-500 text-lg">No blog posts yet. Create your first one!</p>
+          <p className="text-gray-500 text-lg">
+            No blog posts yet. Create your first one!
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,7 +214,9 @@ const BlogTab = () => {
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <div className="flex items-center text-xs text-gray-500">
                     <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                    <span>{new Date(blog.publishDate).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(blog.publishDate).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex items-center text-xs text-gray-500">
                     <Clock className="w-3.5 h-3.5 mr-1.5" />
