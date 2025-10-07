@@ -1,12 +1,6 @@
 import React, { useState } from "react";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Clock,
-  CheckCircle,
-  Calendar,
-} from "lucide-react";
+import { MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
+import { addContactSubmission } from "../service/contactService";
 import Footer from "../component/Footer";
 import Navigation from "../component/Navigation";
 import Action from "../component/Action";
@@ -22,6 +16,9 @@ const ContactPage = () => {
     message: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -29,10 +26,51 @@ const ContactPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    alert("Thank you for your message! We'll get back to you within 24 hours.");
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      // Validate required fields
+      if (
+        !formData.name.trim() ||
+        !formData.company.trim() ||
+        !formData.email.trim() ||
+        !formData.message.trim()
+      ) {
+        alert("Please fill in all required fields");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Submit to Firebase
+      await addContactSubmission(formData);
+
+      // Show success message
+      setSubmitSuccess(true);
+
+      // Reset form
+      setFormData({
+        name: "",
+        company: "",
+        email: "",
+        phone: "",
+        projectType: "",
+        message: "",
+      });
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Failed to submit form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -275,6 +313,20 @@ const ContactPage = () => {
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
                 Send Us a Message
               </h3>
+
+              {/* Success Message */}
+              {submitSuccess && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center text-green-800">
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    <p className="font-semibold">Message sent successfully!</p>
+                  </div>
+                  <p className="text-sm text-green-700 mt-1">
+                    We'll get back to you within 24 hours.
+                  </p>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -397,9 +449,10 @@ const ContactPage = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Send Message
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
 

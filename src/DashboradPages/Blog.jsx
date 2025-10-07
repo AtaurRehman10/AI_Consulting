@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Calendar,
   X,
@@ -6,39 +6,17 @@ import {
   Plus,
   Edit,
   Trash2,
-  Image as ImageIcon,
   Save,
 } from "lucide-react";
+import { getAllBlogs, addBlog, updateBlog, deleteBlog } from '../service/blogService';
 
 const BlogTab = () => {
-  const [blogPosts, setBlogPosts] = useState([
-    {
-      id: 1,
-      blogType: "Getting Started",
-      blogName: "5 Ways AI Saves Time in Your Business",
-      description:
-        "Discover the most impactful automation opportunities that can immediately reduce manual work and boost productivity.",
-      content:
-        "Artificial Intelligence is revolutionizing how small and medium businesses operate. In this guide, we'll explore five practical ways you can implement AI to save time and increase efficiency...",
-      publishDate: "2024-03-15",
-      readTime: "5 min read",
-    },
-    {
-      id: 2,
-      blogType: "Strategy",
-      blogName: "Building an AI Roadmap for SMBs",
-      description:
-        "A step-by-step guide to creating your AI implementation strategy",
-      content:
-        "Creating an effective AI strategy doesn't have to be complicated. Here's how to build a practical roadmap...",
-      publishDate: "2024-03-10",
-      readTime: "7 min read",
-    },
-  ]);
-
   const [showBlogModal, setShowBlogModal] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [blogPosts, setBlogPosts] = useState([]);
+
   const [blogForm, setBlogForm] = useState({
     blogType: "",
     blogName: "",
@@ -57,6 +35,24 @@ const BlogTab = () => {
     "Technology",
     "Automation",
   ];
+
+  // Load blogs from Firebase on component mount
+  useEffect(() => {
+    loadBlogs();
+  }, []);
+
+  const loadBlogs = async () => {
+    try {
+      setLoading(true);
+      const blogs = await getAllBlogs();
+      setBlogPosts(blogs);
+    } catch (error) {
+      console.error('Error loading blogs:', error);
+      alert('Failed to load blog posts. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openAddModal = () => {
     setBlogForm({
@@ -94,6 +90,7 @@ const BlogTab = () => {
     setIsSubmitting(true);
 
     try {
+      // Validation
       if (
         !blogForm.blogType.trim() ||
         !blogForm.blogName.trim() ||
@@ -106,30 +103,17 @@ const BlogTab = () => {
       }
 
       if (editingBlog) {
-        // Update existing blog
-        setBlogPosts(
-          blogPosts.map((b) =>
-            b.id === editingBlog
-              ? {
-                  ...blogForm,
-                  id: editingBlog,
-                  publishDate: new Date().toISOString().split("T")[0],
-                }
-              : b
-          )
-        );
+        // Update existing blog in Firebase
+        await updateBlog(editingBlog, blogForm);
+        alert('Blog post updated successfully!');
       } else {
-        // Add new blog
-        setBlogPosts([
-          ...blogPosts,
-          {
-            ...blogForm,
-            id: Date.now(),
-            publishDate: new Date().toISOString().split("T")[0],
-          },
-        ]);
+        // Add new blog to Firebase
+        await addBlog(blogForm);
+        alert('Blog post published successfully!');
       }
 
+      // Reload blogs from Firebase
+      await loadBlogs();
       setShowBlogModal(false);
     } catch (error) {
       console.error("Error saving blog:", error);
@@ -139,11 +123,30 @@ const BlogTab = () => {
     }
   };
 
-  const handleDeleteBlog = (id) => {
+  const handleDeleteBlog = async (id) => {
     if (window.confirm("Are you sure you want to delete this blog post?")) {
-      setBlogPosts(blogPosts.filter((b) => b.id !== id));
+      try {
+        await deleteBlog(id);
+        alert('Blog post deleted successfully!');
+        // Reload blogs from Firebase
+        await loadBlogs();
+      } catch (error) {
+        console.error("Error deleting blog:", error);
+        alert("Failed to delete blog post. Please try again.");
+      }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -169,55 +172,61 @@ const BlogTab = () => {
       </div>
 
       {/* Blog Posts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogPosts.map((blog) => (
-          <div
-            key={blog.id}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all overflow-hidden"
-          >
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <span className="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700">
-                  {blog.blogType}
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openEditModal(blog)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteBlog(blog.id)}
-                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
+      {blogPosts.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+          <p className="text-gray-500 text-lg">No blog posts yet. Create your first one!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {blogPosts.map((blog) => (
+            <div
+              key={blog.id}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all overflow-hidden"
+            >
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700">
+                    {blog.blogType}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEditModal(blog)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBlog(blog.id)}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
-                {blog.blogName}
-              </h3>
+                <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
+                  {blog.blogName}
+                </h3>
 
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                {blog.description}
-              </p>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                  {blog.description}
+                </p>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <div className="flex items-center text-xs text-gray-500">
-                  <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                  <span>{new Date(blog.publishDate).toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center text-xs text-gray-500">
-                  <Clock className="w-3.5 h-3.5 mr-1.5" />
-                  <span>{blog.readTime}</span>
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center text-xs text-gray-500">
+                    <Calendar className="w-3.5 h-3.5 mr-1.5" />
+                    <span>{new Date(blog.publishDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center text-xs text-gray-500">
+                    <Clock className="w-3.5 h-3.5 mr-1.5" />
+                    <span>{blog.readTime}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Blog Modal */}
       {showBlogModal && (

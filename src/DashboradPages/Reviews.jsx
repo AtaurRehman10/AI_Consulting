@@ -1,42 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Plus, Edit, Trash2, Star, Save } from "lucide-react";
+import {
+  getAllReviews,
+  addReview,
+  updateReview,
+  deleteReview,
+} from "../service/reviewService";
 
 const ReviewsTab = () => {
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "Maria Johnson",
-      designation: "Operations Manager, Austin Manufacturing",
-      rating: 5,
-      description:
-        "Core Implementations transformed our invoice processing from a 3-day manual nightmare to a 2-hour automated process. The ROI was clear within the first month.",
-    },
-    {
-      id: 2,
-      name: "Robert Chen",
-      designation: "CEO, Dallas Professional Services",
-      rating: 5,
-      description:
-        "Finally, a tech company that speaks our language. They understood our business needs and delivered exactly what we needed—no overselling, just results.",
-    },
-    {
-      id: 3,
-      name: "Emily Rodriguez",
-      designation: "Director of Operations, Houston Logistics",
-      rating: 4,
-      description:
-        "Great service and support. The team was responsive and helped us implement AI solutions that actually work for our business size.",
-    },
-  ]);
-
+  const [reviews, setReviews] = useState([]);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [reviewForm, setReviewForm] = useState({
     name: "",
     designation: "",
     rating: 5,
     description: "",
   });
+
+  // Load reviews from Firebase on component mount
+  useEffect(() => {
+    loadReviews();
+  }, []);
+
+  const loadReviews = async () => {
+    try {
+      setLoading(true);
+      const reviewsData = await getAllReviews();
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error("Error loading reviews:", error);
+      alert("Failed to load reviews. Please refresh the page.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openAddModal = () => {
     setReviewForm({
@@ -50,29 +50,64 @@ const ReviewsTab = () => {
   };
 
   const openEditModal = (review) => {
-    setReviewForm(review);
+    setReviewForm({
+      name: review.name,
+      designation: review.designation,
+      rating: review.rating,
+      description: review.description,
+    });
     setEditingReview(review.id);
     setShowReviewModal(true);
   };
 
-  const handleSaveReview = () => {
-    if (editingReview) {
-      // Update existing review
-      setReviews(
-        reviews.map((r) =>
-          r.id === editingReview ? { ...reviewForm, id: editingReview } : r
-        )
-      );
-    } else {
-      // Add new review
-      setReviews([...reviews, { ...reviewForm, id: Date.now() }]);
+  const handleSaveReview = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      // Validation
+      if (
+        !reviewForm.name.trim() ||
+        !reviewForm.designation.trim() ||
+        !reviewForm.description.trim()
+      ) {
+        alert("Please fill in all required fields");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (editingReview) {
+        // Update existing review in Firebase
+        await updateReview(editingReview, reviewForm);
+        alert("Review updated successfully!");
+      } else {
+        // Add new review to Firebase
+        await addReview(reviewForm);
+        alert("Review added successfully!");
+      }
+
+      // Reload reviews from Firebase
+      await loadReviews();
+      setShowReviewModal(false);
+    } catch (error) {
+      console.error("Error saving review:", error);
+      alert("Failed to save review. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setShowReviewModal(false);
   };
 
-  const handleDeleteReview = (id) => {
+  const handleDeleteReview = async (id) => {
     if (window.confirm("Are you sure you want to delete this review?")) {
-      setReviews(reviews.filter((r) => r.id !== id));
+      try {
+        await deleteReview(id);
+        alert("Review deleted successfully!");
+        // Reload reviews from Firebase
+        await loadReviews();
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        alert("Failed to delete review. Please try again.");
+      }
     }
   };
 
@@ -102,6 +137,17 @@ const ReviewsTab = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading reviews...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -126,50 +172,58 @@ const ReviewsTab = () => {
       </div>
 
       {/* Reviews Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {reviews.map((review) => (
-          <div
-            key={review.id}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <StarRating rating={review.rating} />
-              <div className="flex gap-2">
-                <button
-                  onClick={() => openEditModal(review)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Edit className="w-4 h-4 text-gray-600" />
-                </button>
-                <button
-                  onClick={() => handleDeleteReview(review.id)}
-                  className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </button>
+      {reviews.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+          <p className="text-gray-500 text-lg">
+            No reviews yet. Add your first one!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reviews.map((review) => (
+            <div
+              key={review.id}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <StarRating rating={review.rating} />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openEditModal(review)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Edit className="w-4 h-4 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteReview(review.id)}
+                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                "{review.description}"
+              </p>
+
+              <div className="flex items-center pt-4 border-t border-gray-100">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-lg">
+                  {review.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">{review.name}</h4>
+                  <p className="text-sm text-gray-600">{review.designation}</p>
+                </div>
               </div>
             </div>
-
-            <p className="text-gray-700 mb-4 leading-relaxed">
-              "{review.description}"
-            </p>
-
-            <div className="flex items-center pt-4 border-t border-gray-100">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-lg">
-                {review.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()}
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-900">{review.name}</h4>
-                <p className="text-sm text-gray-600">{review.designation}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Review Modal */}
       {showReviewModal && (
@@ -266,10 +320,15 @@ const ReviewsTab = () => {
                 </button>
                 <button
                   onClick={handleSaveReview}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+                  disabled={isSubmitting}
+                  className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-5 h-5" />
-                  {editingReview ? "Update Review" : "Save Review"}
+                  {isSubmitting
+                    ? "Saving..."
+                    : editingReview
+                    ? "Update Review"
+                    : "Save Review"}
                 </button>
               </div>
             </div>

@@ -1,89 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  BrainCircuit,
-  Mail,
-  Users,
-  BookOpen,
-  Calendar,
-  BarChart3,
-  TrendingUp,
-  MessageSquare,
-  FileText,
-  Settings,
-  LogOut,
-  Menu,
   X,
-  ChevronRight,
-  Eye,
-  CheckCircle,
-  Clock,
-  Search,
   Plus,
   Edit,
   Trash2,
-  Download,
-  Filter,
-  MoreVertical,
-  AlertCircle,
-  Send,
-  Star,
-  MapPin,
-  Building2,
-  Tag,
-  Briefcase,
-  Package,
-  Image as ImageIcon,
-  Upload,
   Save,
-  Brain,
-  Sparkles,
-  Target,
-  Rocket,
-  Lightbulb,
-  Zap,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
+import { getAllCaseStudies, addCaseStudy, updateCaseStudy, deleteCaseStudy } from '../service/caseStudyService';
 
 const CaseStudiesTab = () => {
-  const [caseStudies, setCaseStudies] = useState([
-    {
-      id: 1,
-      industryType: "Manufacturing",
-      projectName: "Invoice Processing Automation",
-      companyName: "Local Manufacturing Company",
-      challenge:
-        "Manual invoice processing taking 3 days, high error rates, and frustrated accounting team spending 20+ hours weekly on data entry.",
-      solution:
-        "Implemented OCR technology with intelligent data extraction, automated approval workflows, and integration with existing ERP system.",
-      results: [
-        "70% reduction in processing time (3 days to 8 hours)",
-        "95% accuracy improvement in data extraction",
-        "20 hours weekly time savings for accounting team",
-        "ROI achieved within 6 weeks",
-      ],
-      timeline: "8-12 weeks",
-    },
-    {
-      id: 2,
-      industryType: "Retail",
-      projectName: "Customer Service AI Chatbot",
-      companyName: "Texas Retail Group",
-      challenge:
-        "Overwhelmed customer service team handling 500+ daily inquiries, long wait times, and customer dissatisfaction.",
-      solution:
-        "Deployed AI-powered chatbot with natural language processing, integrated with CRM and order management systems.",
-      results: [
-        "60% of inquiries resolved automatically",
-        "Average response time reduced from 15 minutes to instant",
-        "Customer satisfaction increased by 35%",
-        "Support team now focuses on complex issues",
-      ],
-      timeline: "6-10 weeks",
-    },
-  ]);
-
+  const [caseStudies, setCaseStudies] = useState([]);
   const [showCaseStudyModal, setShowCaseStudyModal] = useState(false);
   const [editingCaseStudy, setEditingCaseStudy] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [caseStudyForm, setCaseStudyForm] = useState({
     industryType: "",
     projectName: "",
@@ -106,6 +38,24 @@ const CaseStudiesTab = () => {
     "Hospitality",
     "Education",
   ];
+
+  // Load case studies from Firebase on component mount
+  useEffect(() => {
+    loadCaseStudies();
+  }, []);
+
+  const loadCaseStudies = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllCaseStudies();
+      setCaseStudies(data);
+    } catch (error) {
+      console.error('Error loading case studies:', error);
+      alert('Failed to load case studies. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openAddModal = () => {
     setCaseStudyForm({
@@ -195,27 +145,28 @@ const CaseStudiesTab = () => {
         return;
       }
 
+      const caseStudyData = {
+        industryType: caseStudyForm.industryType,
+        projectName: caseStudyForm.projectName,
+        companyName: caseStudyForm.companyName,
+        challenge: caseStudyForm.challenge,
+        solution: caseStudyForm.solution,
+        results: validResults,
+        timeline: caseStudyForm.timeline,
+      };
+
       if (editingCaseStudy) {
-        // Update existing case study
-        setCaseStudies(
-          caseStudies.map((cs) =>
-            cs.id === editingCaseStudy
-              ? {
-                  ...caseStudyForm,
-                  id: editingCaseStudy,
-                  results: validResults,
-                }
-              : cs
-          )
-        );
+        // Update existing case study in Firebase
+        await updateCaseStudy(editingCaseStudy, caseStudyData);
+        alert('Case study updated successfully!');
       } else {
-        // Add new case study
-        setCaseStudies([
-          ...caseStudies,
-          { ...caseStudyForm, id: Date.now(), results: validResults },
-        ]);
+        // Add new case study to Firebase
+        await addCaseStudy(caseStudyData);
+        alert('Case study published successfully!');
       }
 
+      // Reload case studies from Firebase
+      await loadCaseStudies();
       setShowCaseStudyModal(false);
     } catch (error) {
       console.error("Error saving case study:", error);
@@ -225,11 +176,30 @@ const CaseStudiesTab = () => {
     }
   };
 
-  const handleDeleteCaseStudy = (id) => {
+  const handleDeleteCaseStudy = async (id) => {
     if (window.confirm("Are you sure you want to delete this case study?")) {
-      setCaseStudies(caseStudies.filter((cs) => cs.id !== id));
+      try {
+        await deleteCaseStudy(id);
+        alert('Case study deleted successfully!');
+        // Reload case studies from Firebase
+        await loadCaseStudies();
+      } catch (error) {
+        console.error("Error deleting case study:", error);
+        alert("Failed to delete case study. Please try again.");
+      }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading case studies...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -255,95 +225,101 @@ const CaseStudiesTab = () => {
       </div>
 
       {/* Case Studies Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {caseStudies.map((caseStudy) => (
-          <div
-            key={caseStudy.id}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all overflow-hidden"
-          >
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <span className="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700">
-                  {caseStudy.industryType}
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openEditModal(caseStudy)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCaseStudy(caseStudy.id)}
-                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
-                </div>
-              </div>
-
-              <h3 className="font-bold text-xl text-gray-900 mb-2">
-                {caseStudy.projectName}
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                {caseStudy.companyName}
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-xs font-bold text-gray-700 uppercase mb-1">
-                    Challenge
-                  </h4>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {caseStudy.challenge}
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-xs font-bold text-gray-700 uppercase mb-1">
-                    Solution
-                  </h4>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {caseStudy.solution}
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-xs font-bold text-gray-700 uppercase mb-2">
-                    Results Achieved
-                  </h4>
-                  <ul className="space-y-1">
-                    {caseStudy.results.slice(0, 3).map((result, idx) => (
-                      <li
-                        key={idx}
-                        className="text-xs text-gray-600 flex items-start"
-                      >
-                        <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                        <span className="line-clamp-1">{result}</span>
-                      </li>
-                    ))}
-                    {caseStudy.results.length > 3 && (
-                      <li className="text-xs text-blue-600 font-medium">
-                        +{caseStudy.results.length - 3} more results
-                      </li>
-                    )}
-                  </ul>
-                </div>
-
-                {caseStudy.timeline && (
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Clock className="w-3.5 h-3.5 mr-1.5" />
-                      <span className="font-medium">Project Timeline:</span>
-                      <span className="ml-1">{caseStudy.timeline}</span>
-                    </div>
+      {caseStudies.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+          <p className="text-gray-500 text-lg">No case studies yet. Add your first one!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {caseStudies.map((caseStudy) => (
+            <div
+              key={caseStudy.id}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all overflow-hidden"
+            >
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <span className="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700">
+                    {caseStudy.industryType}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEditModal(caseStudy)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCaseStudy(caseStudy.id)}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
                   </div>
-                )}
+                </div>
+
+                <h3 className="font-bold text-xl text-gray-900 mb-2">
+                  {caseStudy.projectName}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {caseStudy.companyName}
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-700 uppercase mb-1">
+                      Challenge
+                    </h4>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {caseStudy.challenge}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-700 uppercase mb-1">
+                      Solution
+                    </h4>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {caseStudy.solution}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-700 uppercase mb-2">
+                      Results Achieved
+                    </h4>
+                    <ul className="space-y-1">
+                      {caseStudy.results.slice(0, 3).map((result, idx) => (
+                        <li
+                          key={idx}
+                          className="text-xs text-gray-600 flex items-start"
+                        >
+                          <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                          <span className="line-clamp-1">{result}</span>
+                        </li>
+                      ))}
+                      {caseStudy.results.length > 3 && (
+                        <li className="text-xs text-blue-600 font-medium">
+                          +{caseStudy.results.length - 3} more results
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {caseStudy.timeline && (
+                    <div className="pt-4 border-t border-gray-100">
+                      <div className="flex items-center text-xs text-gray-500">
+                        <Clock className="w-3.5 h-3.5 mr-1.5" />
+                        <span className="font-medium">Project Timeline:</span>
+                        <span className="ml-1">{caseStudy.timeline}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Case Study Modal */}
       {showCaseStudyModal && (

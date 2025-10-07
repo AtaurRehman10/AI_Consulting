@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   Plus,
   Edit,
   Trash2,
-  Image as ImageIcon,
   Upload,
   Save,
   Brain,
@@ -14,56 +13,14 @@ import {
   Lightbulb,
   Zap,
 } from "lucide-react";
+import { getAllServices, addService, updateService, deleteService } from '../service/serviceService';
 
 const ServicesTab = () => {
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      name: "AI Strategy Consultation",
-      logoId: "brain",
-      problem: "Businesses struggle to identify where AI can add value",
-      solution: "We provide expert analysis and roadmap for AI implementation",
-      points: [
-        "Custom AI roadmap",
-        "ROI analysis",
-        "Implementation plan",
-        "Ongoing support",
-      ],
-      image: null,
-    },
-    {
-      id: 2,
-      name: "Process Automation",
-      logoId: "rocket",
-      problem: "Manual processes waste time and resources",
-      solution: "Automate repetitive tasks to increase efficiency",
-      points: [
-        "Workflow analysis",
-        "Custom automation",
-        "Integration support",
-        "Training",
-      ],
-      image: null,
-    },
-    {
-      id: 3,
-      name: "Data Analytics",
-      logoId: "target",
-      problem: "Data insights are hard to extract and visualize",
-      solution: "Transform raw data into actionable business intelligence",
-      points: [
-        "Dashboard creation",
-        "Predictive analytics",
-        "Real-time reporting",
-        "Data integration",
-      ],
-      image: null,
-    },
-  ]);
-
+  const [services, setServices] = useState([]);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedLogo, setSelectedLogo] = useState("");
   const [serviceForm, setServiceForm] = useState({
     name: "",
@@ -81,6 +38,24 @@ const ServicesTab = () => {
     { id: "lightbulb", name: "Lightbulb", icon: Lightbulb },
     { id: "zap", name: "Zap", icon: Zap },
   ];
+
+  // Load services from Firebase on component mount
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    try {
+      setLoading(true);
+      const servicesData = await getAllServices();
+      setServices(servicesData);
+    } catch (error) {
+      console.error('Error loading services:', error);
+      alert('Failed to load services. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getIconComponent = (logoId) => {
     const logo = logoOptions.find((l) => l.id === logoId);
@@ -106,10 +81,10 @@ const ServicesTab = () => {
       problem: service.problem,
       solution: service.solution,
       points: service.points,
-      image: service.image,
+      image: null, // Don't load existing image file
     });
     setSelectedLogo(service.logoId);
-    setEditingService(service.id);
+    setEditingService(service);
     setShowServiceModal(true);
   };
 
@@ -154,6 +129,11 @@ const ServicesTab = () => {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB');
+        return;
+      }
       setServiceForm((prev) => ({
         ...prev,
         image: file,
@@ -182,33 +162,31 @@ const ServicesTab = () => {
         return;
       }
 
+      const serviceData = {
+        name: serviceForm.name,
+        logoId: selectedLogo,
+        problem: serviceForm.problem,
+        solution: serviceForm.solution,
+        points: validPoints,
+      };
+
       if (editingService) {
-        // Update existing service
-        setServices(
-          services.map((s) =>
-            s.id === editingService
-              ? {
-                  ...serviceForm,
-                  id: editingService,
-                  logoId: selectedLogo,
-                  points: validPoints,
-                }
-              : s
-          )
+        // Update existing service in Firebase
+        await updateService(
+          editingService.id, 
+          serviceData, 
+          serviceForm.image, 
+          editingService.imagePath
         );
+        alert('Service updated successfully!');
       } else {
-        // Add new service
-        setServices([
-          ...services,
-          {
-            ...serviceForm,
-            id: Date.now(),
-            logoId: selectedLogo,
-            points: validPoints,
-          },
-        ]);
+        // Add new service to Firebase
+        await addService(serviceData, serviceForm.image);
+        alert('Service added successfully!');
       }
 
+      // Reload services from Firebase
+      await loadServices();
       setShowServiceModal(false);
     } catch (error) {
       console.error("Error saving service:", error);
@@ -218,11 +196,30 @@ const ServicesTab = () => {
     }
   };
 
-  const handleDeleteService = (id) => {
+  const handleDeleteService = async (service) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
-      setServices(services.filter((s) => s.id !== id));
+      try {
+        await deleteService(service.id, service.imagePath);
+        alert('Service deleted successfully!');
+        // Reload services from Firebase
+        await loadServices();
+      } catch (error) {
+        console.error("Error deleting service:", error);
+        alert("Failed to delete service. Please try again.");
+      }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -248,72 +245,88 @@ const ServicesTab = () => {
       </div>
 
       {/* Services Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map((service) => {
-          const IconComponent = getIconComponent(service.logoId);
-          return (
-            <div
-              key={service.id}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg">
-                  <IconComponent className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openEditModal(service)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteService(service.id)}
-                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
-                </div>
-              </div>
-
-              <h3 className="font-bold text-lg text-gray-900 mb-2">
-                {service.name}
-              </h3>
-
-              <div className="mb-3">
-                <p className="text-xs font-bold text-gray-500 uppercase mb-1">
-                  Problem
-                </p>
-                <p className="text-sm text-gray-700">{service.problem}</p>
-              </div>
-
-              <div className="mb-3">
-                <p className="text-xs font-bold text-gray-500 uppercase mb-1">
-                  Solution
-                </p>
-                <p className="text-sm text-gray-700">{service.solution}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase mb-2">
-                  Key Points
-                </p>
-                <ul className="space-y-1">
-                  {service.points.map((point, idx) => (
-                    <li
-                      key={idx}
-                      className="text-xs text-gray-600 flex items-start"
+      {services.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+          <p className="text-gray-500 text-lg">No services yet. Add your first one!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service) => {
+            const IconComponent = getIconComponent(service.logoId);
+            return (
+              <div
+                key={service.id}
+                className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg">
+                    <IconComponent className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEditModal(service)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                      <span className="text-blue-600 mr-2">•</span>
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteService(service)}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
+                </div>
+
+                {service.imageUrl && (
+                  <div className="mb-4 rounded-lg overflow-hidden">
+                    <img 
+                      src={service.imageUrl} 
+                      alt={service.name}
+                      className="w-full h-32 object-cover"
+                    />
+                  </div>
+                )}
+
+                <h3 className="font-bold text-lg text-gray-900 mb-2">
+                  {service.name}
+                </h3>
+
+                <div className="mb-3">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-1">
+                    Problem
+                  </p>
+                  <p className="text-sm text-gray-700">{service.problem}</p>
+                </div>
+
+                <div className="mb-3">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-1">
+                    Solution
+                  </p>
+                  <p className="text-sm text-gray-700">{service.solution}</p>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">
+                    Key Points
+                  </p>
+                  <ul className="space-y-1">
+                    {service.points.map((point, idx) => (
+                      <li
+                        key={idx}
+                        className="text-xs text-gray-600 flex items-start"
+                      >
+                        <span className="text-blue-600 mr-2">•</span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Service Modal */}
       {showServiceModal && (
@@ -455,7 +468,7 @@ const ServicesTab = () => {
               {/* Image Upload */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Service Image
+                  Service Image {editingService && '(Upload new to replace)'}
                 </label>
                 <input
                   type="file"
@@ -478,6 +491,11 @@ const ServicesTab = () => {
                   {serviceForm.image && (
                     <p className="text-sm text-green-600 font-medium mt-2">
                       ✓ {serviceForm.image.name}
+                    </p>
+                  )}
+                  {editingService && editingService.imageUrl && !serviceForm.image && (
+                    <p className="text-sm text-blue-600 font-medium mt-2">
+                      Current image will be kept
                     </p>
                   )}
                 </label>
