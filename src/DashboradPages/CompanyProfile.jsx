@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Save } from "lucide-react";
-import { getCompanyProfile, saveCompanyProfile } from '../service/companyProfileService';
+import { getCompanyProfile, saveCompanyProfile } from "../service/companyProfileService";
 
 const CompanyProfileTab = () => {
   const [companyData, setCompanyData] = useState({
@@ -25,44 +25,13 @@ const CompanyProfileTab = () => {
     try {
       setLoading(true);
       const profileData = await getCompanyProfile();
-      
-      // If no data exists, set default values
-      if (!profileData.companyName && profileData.teamMembers.length === 0) {
-        const defaultData = {
-          companyName: "Core Implementations",
-          completeProjects: "50+",
-          headline: "Streamline Your Business with AI",
-          description: "We help Texas SMBs unlock AI automation for efficiency and growth. Transform your operations with intelligent solutions designed for your business.",
-          teamMembers: [
-            {
-              id: 1,
-              name: "John Smith",
-              role: "CEO & Founder",
-              description: "15+ years in AI and machine learning, leading innovation in SMB solutions.",
-            },
-            {
-              id: 2,
-              name: "Sarah Johnson",
-              role: "CTO",
-              description: "Expert in automation systems with a passion for simplifying complex technology.",
-            },
-            {
-              id: 3,
-              name: "Mike Chen",
-              role: "Lead Developer",
-              description: "Full-stack developer specializing in AI integration and custom solutions.",
-            },
-          ],
-        };
-        setCompanyData(defaultData);
-        setEditData(defaultData);
-      } else {
-        setCompanyData(profileData);
-        setEditData(profileData);
-      }
+
+      // Set the data directly from Firebase (defaults are handled in service)
+      setCompanyData(profileData);
+      setEditData(profileData);
     } catch (error) {
-      console.error('Error loading company profile:', error);
-      alert('Failed to load company profile. Please refresh the page.');
+      console.error("Error loading company profile:", error);
+      alert("Failed to load company profile. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -74,10 +43,10 @@ const CompanyProfileTab = () => {
       await saveCompanyProfile(editData);
       setCompanyData(editData);
       setIsEditing(false);
-      alert('Company profile updated successfully!');
+      alert("Company profile updated successfully!");
     } catch (error) {
-      console.error('Error saving company profile:', error);
-      alert('Failed to save company profile. Please try again.');
+      console.error("Error saving company profile:", error);
+      alert("Failed to save company profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -169,7 +138,7 @@ const CompanyProfileTab = () => {
                 className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5" />
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           )}
@@ -289,7 +258,8 @@ const CompanyProfileTab = () => {
 
         {(isEditing ? editData : companyData).teamMembers.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
-            No team members yet. Click "Add Member" to add your first team member!
+            No team members yet. Click "Add Member" to add your first team
+            member!
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
