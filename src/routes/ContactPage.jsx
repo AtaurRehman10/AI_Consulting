@@ -1,13 +1,19 @@
 import React, { useState, useRef } from "react";
-import { MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, CheckCircle, Calendar, FileText, MessageSquare } from "lucide-react";
+ 
 import { addContactSubmission } from "../service/contactService";
+import { addRFPSubmission } from "../service/rfpService";
 import Footer from "../component/Footer";
 import Navigation from "../component/Navigation";
 import Action from "../component/Action";
 
-// Contact Page Component
-const ContactPage = () => {
-  const [formData, setFormData] = useState({
+const EnhancedContactPage = () => {
+  const [activeTab, setActiveTab] = useState("contact");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  
+  // Contact Form State
+  const [contactForm, setContactForm] = useState({
     name: "",
     company: "",
     email: "",
@@ -16,48 +22,41 @@ const ContactPage = () => {
     message: "",
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  // RFP Form State
+  const [rfpForm, setRFPForm] = useState({
+    name: "",
+    email: "",
+    company: "",
+    companySize: "",
+    systemsInUse: "",
+    topPain1: "",
+    topPain2: "",
+    timeline: "",
+    budgetBand: "",
+    additionalDetails: "",
+  });
+
   const contactFormRef = useRef(null);
 
   const scrollToContactForm = () => {
     contactFormRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
-
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      // Validate required fields
-      if (
-        !formData.name.trim() ||
-        !formData.company.trim() ||
-        !formData.email.trim() ||
-        !formData.message.trim()
-      ) {
+      if (!contactForm.name.trim() || !contactForm.email.trim() || !contactForm.message.trim()) {
         alert("Please fill in all required fields");
         setIsSubmitting(false);
         return;
       }
 
-      // Submit to Firebase
-      await addContactSubmission(formData);
-
-      // Show success message
+      await addContactSubmission(contactForm);
       setSubmitSuccess(true);
-
-      // Reset form
-      setFormData({
+      setContactForm({
         name: "",
         company: "",
         email: "",
@@ -66,10 +65,7 @@ const ContactPage = () => {
         message: "",
       });
 
-      // Hide success message after 5 seconds
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 5000);
+      setTimeout(() => setSubmitSuccess(false), 5000);
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to submit form. Please try again.");
@@ -78,153 +74,142 @@ const ContactPage = () => {
     }
   };
 
+  const handleRFPSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      if (!rfpForm.name.trim() || !rfpForm.email.trim() || !rfpForm.topPain1.trim()) {
+        alert("Please fill in all required fields");
+        setIsSubmitting(false);
+        return;
+      }
+
+      await addRFPSubmission(rfpForm);
+      setSubmitSuccess(true);
+      setRFPForm({
+        name: "",
+        email: "",
+        company: "",
+        companySize: "",
+        systemsInUse: "",
+        topPain1: "",
+        topPain2: "",
+        timeline: "",
+        budgetBand: "",
+        additionalDetails: "",
+      });
+
+      setTimeout(() => setSubmitSuccess(false), 5000);
+    } catch (error) {
+      console.error("Error submitting RFP:", error);
+      alert("Failed to submit RFP. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="pt-16">
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
       {/* Hero Section */}
-      <section className="relative min-h-[92vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 py-24 overflow-hidden">
-        {/* Decorative Elements */}
+      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 py-24 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
-          <div
-            className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
-            style={{ animationDelay: "1s" }}
-          ></div>
-          <div
-            className="absolute top-1/2 right-1/3 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"
-            style={{ animationDelay: "0.5s" }}
-          ></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse" style={{ animationDelay: "1s" }}></div>
         </div>
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/30 pointer-events-none"></div>
-
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Badge */}
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-28">
           <div className="inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-emerald-200 mb-8">
-            <span className="flex items-center">
-              <svg
-                className="w-4 h-4 text-emerald-600 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-sm font-medium text-gray-800">
-                Ready to Launch
-              </span>
-            </span>
+            <svg className="w-4 h-4 text-emerald-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm font-medium text-gray-800">Multiple Ways to Connect</span>
           </div>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
-            Get Started{" "}
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Today
-            </span>
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+            Get Started <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Today</span>
           </h1>
 
-          {/* Subheading */}
           <p className="text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8">
-            Ready to transform your business with AI? Let's discuss your goals
-            and create a custom solution.
+            Choose the best way to connect: quick contact, schedule a meeting, or submit a detailed RFP
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-10">
-            <button
-              onClick={scrollToContactForm}
-              className="group px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center"
-            >
-              Schedule Consultation
-              <svg
-                className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={scrollToContactForm}
-              className="px-10 py-4 bg-white/90 backdrop-blur-sm text-gray-800 rounded-xl font-bold text-lg hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-300 transform hover:-translate-y-1"
-            >
-              Contact Us
-            </button>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap gap-6 justify-center items-center text-sm text-gray-600">
-            <div className="flex items-center">
-              <svg
-                className="w-5 h-5 text-green-600 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="font-semibold">Free Consultation</span>
-            </div>
-            <div className="flex items-center">
-              <svg
-                className="w-5 h-5 text-green-600 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="font-semibold">No Obligation</span>
-            </div>
-            <div className="flex items-center">
-              <svg
-                className="w-5 h-5 text-green-600 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="font-semibold">Custom Solutions</span>
-            </div>
-          </div>
+          <button
+            onClick={scrollToContactForm}
+            className="group px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center mx-auto"
+          >
+            Choose Your Path
+            <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
         </div>
       </section>
 
-      {/* Contact Section */}
+      {/* Main Content with Tabs */}
       <section ref={contactFormRef} className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Information */}
-            <div className="space-y-8">
+          
+          {/* Tab Navigation */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2 mb-8">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setActiveTab("contact")}
+                className={`flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${
+                  activeTab === "contact"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <MessageSquare className="w-5 h-5" />
+                <span className="hidden sm:inline">Quick Contact</span>
+                <span className="sm:hidden">Contact</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab("appointment")}
+                className={`flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${
+                  activeTab === "appointment"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Calendar className="w-5 h-5" />
+                <span className="hidden sm:inline">Book Meeting</span>
+                <span className="sm:hidden">Meeting</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab("rfp")}
+                className={`flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${
+                  activeTab === "rfp"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="w-5 h-5" />
+                <span className="hidden sm:inline">Submit RFP</span>
+                <span className="sm:hidden">RFP</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="grid lg:grid-cols-3 gap-12">
+            {/* Left Column - Info */}
+            <div className="lg:col-span-1 space-y-8">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                  Let's Talk About Your AI Journey
+                  {activeTab === "contact" && "Let's Talk"}
+                  {activeTab === "appointment" && "Schedule Time"}
+                  {activeTab === "rfp" && "Submit Your RFP"}
                 </h2>
                 <p className="text-lg text-gray-600 mb-8">
-                  We're here to help you understand how AI can transform your
-                  business. Schedule a free consultation or reach out with any
-                  questions.
+                  {activeTab === "contact" && "Quick questions? Drop us a message and we'll respond within 24 hours."}
+                  {activeTab === "appointment" && "Book a consultation that fits your needs - from quick discovery calls to deep technical discussions."}
+                  {activeTab === "rfp" && "Planning a major project? Submit a detailed RFP and receive a comprehensive proposal."}
                 </p>
               </div>
 
@@ -245,9 +230,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Email</div>
-                    <div className="text-gray-600">
-                      hello@coreimplementations.com
-                    </div>
+                    <div className="text-gray-600">hello@coreimplementations.com</div>
                   </div>
                 </div>
 
@@ -256,12 +239,8 @@ const ContactPage = () => {
                     <Clock className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">
-                      Business Hours
-                    </div>
-                    <div className="text-gray-600">
-                      Monday - Friday: 9AM - 6PM CST
-                    </div>
+                    <div className="font-semibold text-gray-900">Business Hours</div>
+                    <div className="text-gray-600">Monday - Friday: 9AM - 6PM CST</div>
                   </div>
                 </div>
 
@@ -275,214 +254,357 @@ const ContactPage = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Consultation Types */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Consultation Options
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        Free 30-minute Discovery Call
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Perfect for understanding AI opportunities
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        Paid Strategy Session
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Deep-dive consultation with actionable roadmap
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        Custom Project Consultation
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Detailed scoping for specific AI implementations
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Send Us a Message
-              </h3>
+            {/* Right Column - Forms/Calendly */}
+            <div className="lg:col-span-2">
+              {/* Quick Contact Form */}
+              {activeTab === "contact" && (
+                <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-lg">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h3>
 
-              {/* Success Message */}
-              {submitSuccess && (
-                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center text-green-800">
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    <p className="font-semibold">Message sent successfully!</p>
-                  </div>
-                  <p className="text-sm text-green-700 mt-1">
-                    We'll get back to you within 24 hours.
-                  </p>
+                  {submitSuccess && (
+                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center text-green-800">
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        <p className="font-semibold">Message sent successfully!</p>
+                      </div>
+                      <p className="text-sm text-green-700 mt-1">We'll get back to you within 24 hours.</p>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleContactSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={contactForm.name}
+                          onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="John Smith"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                        <input
+                          type="text"
+                          value={contactForm.company}
+                          onChange={(e) => setContactForm({ ...contactForm, company: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Your Company"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                        <input
+                          type="email"
+                          required
+                          value={contactForm.email}
+                          onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="john@company.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input
+                          type="tel"
+                          value={contactForm.phone}
+                          onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="(713) 555-0123"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                      <textarea
+                        required
+                        rows={4}
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Tell us about your needs..."
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? "Sending..." : "Send Message"}
+                    </button>
+                  </form>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="John Smith"
-                    />
+              {/* Calendly Embed */}
+              {activeTab === "appointment" && (
+                <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-lg">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Choose Your Meeting Type</h3>
+                  <p className="text-gray-600 mb-6">Select the consultation that best fits your needs</p>
+                  
+                  <div className="grid md:grid-cols-2 gap-6 mb-8">
+                    <div className="border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition-all cursor-pointer">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-bold text-gray-900">Discovery Call</h4>
+                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">20 min</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span>Quick assessment of AI opportunities</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span>High-level roadmap discussion</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span>Perfect for initial exploration</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="border-2 border-purple-200 rounded-xl p-6 hover:border-purple-400 transition-all cursor-pointer">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-bold text-gray-900">Technical Deep Dive</h4>
+                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">45 min</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span>Detailed technical requirements review</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span>System architecture discussion</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span>Custom solution planning</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-                  <div>
-                    <label
-                      htmlFor="company"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Company Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      required
-                      value={formData.company}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="Your Company"
-                    />
+
+                  {/* Calendly Embed Container */}
+                  <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
+                    <div className="text-center py-12">
+                      <Calendar className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                      <h4 className="text-xl font-bold text-gray-900 mb-2">Calendly Integration</h4>
+                      <p className="text-gray-600 mb-6">
+                        Replace this section with your Calendly embed code
+                      </p>
+                      <div className="bg-white rounded-lg p-6 text-left">
+                        <code className="text-sm text-gray-700 block whitespace-pre-wrap">
+{`<!-- Calendly inline widget begin -->
+<div class="calendly-inline-widget" 
+     data-url="https://calendly.com/your-link" 
+     style="min-width:320px;height:700px;">
+</div>
+<script type="text/javascript" 
+        src="https://assets.calendly.com/assets/external/widget.js" 
+        async>
+</script>
+<!-- Calendly inline widget end -->`}
+                        </code>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-4">
+                        Get your Calendly embed code from your Calendly dashboard
+                      </p>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+              {/* RFP Form */}
+              {activeTab === "rfp" && (
+                <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-lg">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Submit Your RFP</h3>
+                  <p className="text-gray-600 mb-6">
+                    Provide detailed information about your project requirements and we'll respond with a comprehensive proposal.
+                  </p>
+
+                  {submitSuccess && (
+                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center text-green-800">
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        <p className="font-semibold">RFP submitted successfully!</p>
+                      </div>
+                      <p className="text-sm text-green-700 mt-1">We'll review your requirements and respond within 48 hours.</p>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleRFPSubmit} className="space-y-6">
+                    {/* Basic Info */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={rfpForm.name}
+                          onChange={(e) => setRFPForm({ ...rfpForm, name: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="John Smith"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                        <input
+                          type="email"
+                          required
+                          value={rfpForm.email}
+                          onChange={(e) => setRFPForm({ ...rfpForm, email: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="john@company.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                        <input
+                          type="text"
+                          value={rfpForm.company}
+                          onChange={(e) => setRFPForm({ ...rfpForm, company: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Your Company"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
+                        <select
+                          value={rfpForm.companySize}
+                          onChange={(e) => setRFPForm({ ...rfpForm, companySize: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">Select size...</option>
+                          <option value="1-10">1-10 employees</option>
+                          <option value="11-50">11-50 employees</option>
+                          <option value="51-200">51-200 employees</option>
+                          <option value="201-500">201-500 employees</option>
+                          <option value="500+">500+ employees</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Systems in Use */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Current Systems in Use</label>
+                      <input
+                        type="text"
+                        value={rfpForm.systemsInUse}
+                        onChange={(e) => setRFPForm({ ...rfpForm, systemsInUse: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., Salesforce, SAP, custom CRM..."
+                      />
+                    </div>
+
+                    {/* Pain Points */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Top Pain Point #1 *</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={rfpForm.topPain1}
+                        onChange={(e) => setRFPForm({ ...rfpForm, topPain1: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Describe your biggest challenge..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Top Pain Point #2</label>
+                      <textarea
+                        rows={3}
+                        value={rfpForm.topPain2}
+                        onChange={(e) => setRFPForm({ ...rfpForm, topPain2: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Another key challenge (optional)..."
+                      />
+                    </div>
+
+                    {/* Timeline & Budget */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Desired Timeline</label>
+                        <select
+                          value={rfpForm.timeline}
+                          onChange={(e) => setRFPForm({ ...rfpForm, timeline: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">Select timeline...</option>
+                          <option value="asap">ASAP (1-2 months)</option>
+                          <option value="quarter">This Quarter</option>
+                          <option value="6months">Next 6 months</option>
+                          <option value="year">Within a year</option>
+                          <option value="flexible">Flexible</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
+                        <select
+                          value={rfpForm.budgetBand}
+                          onChange={(e) => setRFPForm({ ...rfpForm, budgetBand: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">Select budget...</option>
+                          <option value="under25k">Under $25,000</option>
+                          <option value="25k-50k">$25,000 - $50,000</option>
+                          <option value="50k-100k">$50,000 - $100,000</option>
+                          <option value="100k-250k">$100,000 - $250,000</option>
+                          <option value="250k+">$250,000+</option>
+                          <option value="tbd">To Be Determined</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Additional Details */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Additional Project Details</label>
+                      <textarea
+                        rows={5}
+                        value={rfpForm.additionalDetails}
+                        onChange={(e) => setRFPForm({ ...rfpForm, additionalDetails: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Any additional context, requirements, or specific questions..."
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="john@company.com"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="(713) 555-0123"
-                    />
-                  </div>
+                      {isSubmitting ? "Submitting..." : "Submit RFP"}
+                    </button>
+
+                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>What happens next?</strong> We'll review your RFP and respond with a detailed proposal within 48 hours, including timelines, pricing, and our recommended approach.
+                      </p>
+                    </div>
+                  </form>
                 </div>
-
-                <div>
-                  <label
-                    htmlFor="projectType"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Project Type
-                  </label>
-                  <select
-                    id="projectType"
-                    name="projectType"
-                    value={formData.projectType}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  >
-                    <option value="">Select a project type</option>
-                    <option value="strategy">AI Strategy & Planning</option>
-                    <option value="automation">Process Automation</option>
-                    <option value="data">Data & Insights</option>
-                    <option value="custom">Custom AI Solutions</option>
-                    <option value="consultation">General Consultation</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Tell us about your project *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Describe your current challenges and what you hope to achieve with AI..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {isSubmitting ? "Sending..." : "Send Message"}
-                </button>
-              </form>
-
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>What happens next?</strong> We'll review your message
-                  and get back to you within 24 hours to schedule your free
-                  consultation.
-                </p>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </section>
-
       <Action />
       <Footer />
     </div>
   );
 };
 
-export default ContactPage;
+export default EnhancedContactPage;

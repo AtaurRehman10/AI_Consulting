@@ -11,6 +11,7 @@ import {
   MapPin,
   Building2,
   Briefcase,
+  
 } from "lucide-react";
 import { getCompanyProfile } from "../service/companyProfileService";
 
@@ -21,6 +22,7 @@ import ServicesTab from "../DashboradPages/Services";
 import BlogTab from "../DashboradPages/Blog";
 import CaseStudiesTab from "../DashboradPages/CaseStudies";
 import ReviewsTab from "../DashboradPages/Reviews";
+import RFPTab from "../DashboradPages/RFP";
 
 const AdminDashboard = () => {
   const [companyName, setCompanyName] = useState("Core Implementations");
@@ -112,6 +114,11 @@ const AdminDashboard = () => {
             id: "contacts",
             icon: MessageSquare,
             label: "Contact Forms",
+          },
+          {
+            id: "rfps",
+            icon: FileText,
+            label: "RFP Submissions",
           },
           { id: "services", icon: Briefcase, label: "Services" },
           { id: "blog", icon: BookOpen, label: "Blog Posts" },
@@ -205,6 +212,7 @@ const AdminDashboard = () => {
         <main className="p-8">
           {activeTab === "overview" && <OverviewTab />}
           {activeTab === "contacts" && <ContactsTab />}
+          {activeTab === "rfps" && <RFPTab />}
           {activeTab === "services" && <ServicesTab />}
           {activeTab === "blog" && <BlogTab />}
           {activeTab === "case-studies" && <CaseStudiesTab />}

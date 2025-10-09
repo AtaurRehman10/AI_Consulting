@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, Link } from "react-router-dom";
-import { BrainCircuit, Menu, X } from "lucide-react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { BrainCircuit, Menu, X, ChevronDown, MessageSquare, Calendar, FileText } from "lucide-react";
 import { getCompanyProfile } from "../service/companyProfileService";
 
 // Navigation Component
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showContactDropdown, setShowContactDropdown] = useState(false);
   const [companyName, setCompanyName] = useState("Core Implementations");
+  const navigate = useNavigate();
 
   // Load company name from Firebase
   useEffect(() => {
@@ -39,8 +41,43 @@ const Navigation = () => {
     { id: "services", label: "Services", to: "/services" },
     { id: "case-studies", label: "Case Studies", to: "/case-studies" },
     { id: "resources", label: "Resources", to: "/resources" },
-    { id: "contact", label: "Contact", to: "/contact" },
   ];
+
+  const contactOptions = [
+    {
+      id: "contact",
+      label: "Quick Contact",
+      description: "Send us a message",
+      icon: MessageSquare,
+      to: "/contact?tab=contact",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      id: "appointment",
+      label: "Book Meeting",
+      description: "Schedule a consultation",
+      icon: Calendar,
+      to: "/contact?tab=appointment",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+    },
+    {
+      id: "rfp",
+      label: "Submit RFP",
+      description: "Request for proposal",
+      icon: FileText,
+      to: "/contact?tab=rfp",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+    },
+  ];
+
+  const handleContactClick = (to) => {
+    setShowContactDropdown(false);
+    setIsMenuOpen(false);
+    navigate(to);
+  };
 
   return (
     <nav
@@ -104,11 +141,52 @@ const Navigation = () => {
                   )}
                 </NavLink>
               ))}
+
+              {/* Contact Dropdown - Desktop */}
+              <div
+                className="relative"
+                onMouseEnter={() => setShowContactDropdown(true)}
+                onMouseLeave={() => setShowContactDropdown(false)}
+              >
+                <button className="relative px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-all duration-200 rounded-lg group flex items-center gap-1">
+                  <span className="relative z-10">Contact</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showContactDropdown ? 'rotate-180' : ''}`} />
+                  <span className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showContactDropdown && (
+                  <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 py-2 animate-fadeIn">
+                    {contactOptions.map((option) => {
+                      const IconComponent = option.icon;
+                      return (
+                        <button
+                          key={option.id}
+                          onClick={() => handleContactClick(option.to)}
+                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-start gap-3 text-left group"
+                        >
+                          <div className={`${option.bgColor} p-2 rounded-lg ${option.color} group-hover:scale-110 transition-transform`}>
+                            <IconComponent className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <div className={`font-semibold ${option.color} group-hover:text-opacity-80`}>
+                              {option.label}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {option.description}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Desktop CTA Button */}
-            <Link
-              to="/contact"
+            <button
+              onClick={() => handleContactClick("/contact?tab=appointment")}
               className="ml-4 relative group overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:-translate-y-0.5"
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -129,7 +207,7 @@ const Navigation = () => {
               </span>
               {/* Shine effect */}
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
-            </Link>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -171,11 +249,42 @@ const Navigation = () => {
                 </NavLink>
               ))}
 
+              {/* Contact Options - Mobile */}
+              <div className="pt-2 space-y-2">
+                <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase">
+                  Get in Touch
+                </div>
+                {contactOptions.map((option, index) => {
+                  const IconComponent = option.icon;
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => handleContactClick(option.to)}
+                      className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left rounded-xl"
+                      style={{
+                        animationDelay: `${(navItems.length + index) * 50}ms`,
+                      }}
+                    >
+                      <div className={`${option.bgColor} p-2 rounded-lg ${option.color}`}>
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className={`font-semibold ${option.color}`}>
+                          {option.label}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {option.description}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Mobile CTA Button */}
               <div className="pt-2">
-                <Link
-                  to="/contact"
-                  onClick={() => setIsMenuOpen(false)}
+                <button
+                  onClick={() => handleContactClick("/contact?tab=appointment")}
                   className="block w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-4 rounded-xl text-center font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform active:scale-95"
                 >
                   <span className="flex items-center justify-center gap-2">
@@ -194,12 +303,29 @@ const Navigation = () => {
                       />
                     </svg>
                   </span>
-                </Link>
+                </button>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Add fadeIn animation to your global CSS */}
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+      `}</style>
     </nav>
   );
 };
