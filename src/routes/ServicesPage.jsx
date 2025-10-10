@@ -63,16 +63,16 @@ const ServicesPage = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative min-h-[92vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 py-24 overflow-hidden">
+      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 py-12 sm:py-16 lg:py-24 overflow-hidden flex items-center justify-center">
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-20 right-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
+          <div className="absolute top-20 right-10 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
           <div
-            className="absolute bottom-10 left-10 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
+            className="absolute bottom-10 left-10 w-40 h-40 sm:w-60 sm:h-60 lg:w-80 lg:h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
             style={{ animationDelay: "1s" }}
           ></div>
           <div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"
             style={{ animationDelay: "0.5s" }}
           ></div>
         </div>
@@ -80,7 +80,7 @@ const ServicesPage = () => {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/30 pointer-events-none"></div>
 
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-8 sm:py-12 lg:py-16 flex flex-col items-center justify-center w-full">
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-indigo-200 mb-8">
             <span className="w-2 h-2 bg-indigo-600 rounded-full mr-2 animate-pulse"></span>
@@ -90,7 +90,7 @@ const ServicesPage = () => {
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
             Comprehensive{" "}
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
               AI Solutions
@@ -99,13 +99,13 @@ const ServicesPage = () => {
           </h1>
 
           {/* Subheading */}
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8 px-4">
             From strategy to implementation, we provide end-to-end AI services
             designed specifically for growing businesses
           </p>
 
           {/* Feature Pills */}
-          <div className="flex flex-wrap gap-3 justify-center items-center">
+          <div className="flex flex-wrap gap-3 justify-center items-center px-4">
             <span className="px-5 py-2 bg-white/90 backdrop-blur-sm rounded-full text-sm font-semibold text-gray-700 shadow-md border border-gray-200">
               Strategy
             </span>

@@ -11,7 +11,6 @@ import {
   MapPin,
   Building2,
   Briefcase,
-  
 } from "lucide-react";
 import { getCompanyProfile } from "../service/companyProfileService";
 

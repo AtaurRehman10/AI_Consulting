@@ -97,7 +97,7 @@ const Homepage = () => {
     <div className="pt-16">
       <Navigation />
       {/* Hero Section */}
-      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 overflow-hidden py-8">
+      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 overflow-hidden py-8 flex items-center justify-center">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
@@ -111,8 +111,8 @@ const Homepage = () => {
           ></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex flex-col items-center justify-center w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center w-full max-w-6xl">
             {/* Left Content */}
             <div className="space-y-8">
               <div className="space-y-6">

@@ -20,7 +20,17 @@ const AboutPage = () => {
   const valuesRef = useRef(null);
 
   const scrollToValues = () => {
-    valuesRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (valuesRef.current) {
+      const element = valuesRef.current;
+      const offset = 80; // Account for navigation height and some padding
+      const elementPosition = element.offsetTop;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
   };
 
   // Gradient colors for team avatars
@@ -71,20 +81,20 @@ const AboutPage = () => {
     <div className="pt-16">
       <Navigation />
       {/* Hero Section */}
-      <section className="relative min-h-[92vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 flex items-center overflow-hidden">
+      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 flex items-center overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
+          <div className="absolute top-10 left-10 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
           <div
-            className="absolute top-40 right-20 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
+            className="absolute top-40 right-10 sm:right-20 w-40 h-40 sm:w-60 sm:h-60 lg:w-80 lg:h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
             style={{ animationDelay: "0.5s" }}
           ></div>
           <div
-            className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
+            className="absolute bottom-10 right-10 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"
             style={{ animationDelay: "1s" }}
           ></div>
           <div
-            className="absolute bottom-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"
+            className="absolute bottom-20 left-20 w-36 h-36 sm:w-54 sm:h-54 lg:w-72 lg:h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"
             style={{ animationDelay: "1.5s" }}
           ></div>
         </div>
@@ -102,7 +112,7 @@ const AboutPage = () => {
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-sm">
             Why Core Implementations{" "}
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Exists
@@ -110,31 +120,38 @@ const AboutPage = () => {
           </h1>
 
           {/* Subheading */}
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto font-normal mb-8 px-4">
             Bridging the gap between enterprise AI capabilities and small
             business accessibility
           </p>
 
           {/* Optional CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-2 justify-center items-center px-4">
             <button
               onClick={scrollToValues}
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+              className="group w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center mx-auto"
             >
               Learn More
-            </button>
-            <button
-              onClick={scrollToValues}
-              className="px-8 py-3 bg-white/90 backdrop-blur-sm text-gray-800 rounded-lg font-semibold hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-300"
-            >
-              Get Started
+              <svg
+                className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
             </button>
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="py-20">
+      <section ref={valuesRef} className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
