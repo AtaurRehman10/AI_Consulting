@@ -1,18 +1,107 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { MapPin, Phone, Mail, Clock, CheckCircle, Calendar, FileText, MessageSquare } from "lucide-react";
- 
+
 import { addContactSubmission } from "../service/contactService";
 import { addRFPSubmission } from "../service/rfpService";
 import Footer from "../component/Footer";
 import Navigation from "../component/Navigation";
 import Action from "../component/Action";
 
+function CalendlyWidget45min() {
+  useEffect(() => {
+    // Load Calendly script
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">Schedule a Meeting</h1>
+            <p className="text-blue-100">Choose a time that works best for you</p>
+          </div>
+
+        {/* Calendly Widget */}
+        <div className="p-4 md:p-8">
+            <div 
+              className="calendly-inline-widget rounded-lg overflow-hidden shadow-inner" 
+              data-url="https://calendly.com/ataulrehmangee994/level-meet?month=2025-10&hide_gdpr_banner=1"
+              style={{ minWidth: '320px', height: '800px' }}
+            />
+          </div>
+
+          {/* Footer */}
+          <div className="bg-gray-50 p-4 text-center border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              Powered by <span className="font-semibold text-blue-600">Calendly</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CalendlyWidget20min() {
+  useEffect(() => {
+    // Load Calendly script
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">Schedule a Meeting</h1>
+            <p className="text-blue-100">Choose a time that works best for you</p>
+          </div>
+
+        {/* Calendly Widget */}
+        <div className="p-4 md:p-8">
+            <div 
+              className="calendly-inline-widget rounded-lg overflow-hidden shadow-inner" 
+              data-url="https://calendly.com/ataulrehmangee994/20-minute-meeting?month=2025-10&hide_gdpr_banner=1"
+              style={{ minWidth: '320px', height: '800px' }}
+            />
+          </div>
+
+          {/* Footer */}
+          <div className="bg-gray-50 p-4 text-center border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              Powered by <span className="font-semibold text-blue-600">Calendly</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const EnhancedContactPage = () => {
   const [activeTab, setActiveTab] = useState("contact");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  
-  // Contact Form State
+  const [selectedMeetingType, setSelectedMeetingType] = useState(null);
   const [contactForm, setContactForm] = useState({
     name: "",
     company: "",
@@ -352,7 +441,10 @@ const EnhancedContactPage = () => {
                   <p className="text-gray-600 mb-6">Select the consultation that best fits your needs</p>
                   
                   <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    <div className="border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition-all cursor-pointer">
+                    <div 
+                      className={`border-2 rounded-xl p-6 transition-all cursor-pointer hover:scale-105 ${selectedMeetingType === '20min' ? 'border-blue-500 bg-blue-50' : 'border-blue-200 hover:border-blue-400'}`}
+                      onClick={() => setSelectedMeetingType('20min')}
+                    >
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="text-lg font-bold text-gray-900">Discovery Call</h4>
                         <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">20 min</span>
@@ -371,9 +463,17 @@ const EnhancedContactPage = () => {
                           <span>Perfect for initial exploration</span>
                         </li>
                       </ul>
+                      {selectedMeetingType === '20min' && (
+                        <div className="mt-4 p-3 bg-green-100 rounded-lg">
+                          <p className="text-sm text-green-800 font-semibold">✓ Selected - Click to schedule</p>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="border-2 border-purple-200 rounded-xl p-6 hover:border-purple-400 transition-all cursor-pointer">
+                    <div 
+                      className={`border-2 rounded-xl p-6 transition-all cursor-pointer hover:scale-105 ${selectedMeetingType === '45min' ? 'border-purple-500 bg-purple-50' : 'border-purple-200 hover:border-purple-400'}`}
+                      onClick={() => setSelectedMeetingType('45min')}
+                    >
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="text-lg font-bold text-gray-900">Technical Deep Dive</h4>
                         <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">45 min</span>
@@ -392,36 +492,24 @@ const EnhancedContactPage = () => {
                           <span>Custom solution planning</span>
                         </li>
                       </ul>
+                      {selectedMeetingType === '45min' && (
+                        <div className="mt-4 p-3 bg-green-100 rounded-lg">
+                          <p className="text-sm text-green-800 font-semibold">✓ Selected - Click to schedule</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Calendly Embed Container */}
-                  <div className="bg-gray-50 rounded-xl p-8 border border-gray-200">
-                    <div className="text-center py-12">
-                      <Calendar className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                      <h4 className="text-xl font-bold text-gray-900 mb-2">Calendly Integration</h4>
-                      <p className="text-gray-600 mb-6">
-                        Replace this section with your Calendly embed code
-                      </p>
-                      <div className="bg-white rounded-lg p-6 text-left">
-                        <code className="text-sm text-gray-700 block whitespace-pre-wrap">
-{`<!-- Calendly inline widget begin -->
-<div class="calendly-inline-widget" 
-     data-url="https://calendly.com/your-link" 
-     style="min-width:320px;height:700px;">
-</div>
-<script type="text/javascript" 
-        src="https://assets.calendly.com/assets/external/widget.js" 
-        async>
-</script>
-<!-- Calendly inline widget end -->`}
-                        </code>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-4">
-                        Get your Calendly embed code from your Calendly dashboard
+                  {/* Calendly Widget Component */}
+                  {selectedMeetingType === '20min' && <CalendlyWidget20min />}
+                  {selectedMeetingType === '45min' && <CalendlyWidget45min />}
+                  {selectedMeetingType && (
+                    <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="text-sm text-blue-800 text-center">
+                        <strong>Ready to schedule?</strong> Select your preferred time slot above to book your meeting.
                       </p>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 
