@@ -97,7 +97,7 @@ const Homepage = () => {
     <div className="pt-16">
       <Navigation />
       {/* Hero Section */}
-      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 overflow-hidden py-8 flex items-center justify-center">
+      <section className="relative min-h-[70vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 flex items-center overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>

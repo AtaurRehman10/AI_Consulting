@@ -63,7 +63,7 @@ const ServicesPage = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative min-h-[100vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 py-12 sm:py-16 lg:py-24 overflow-hidden flex items-center justify-center">
+      <section className="relative min-h-[70vh] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-50 flex items-center overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-20 right-10 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>

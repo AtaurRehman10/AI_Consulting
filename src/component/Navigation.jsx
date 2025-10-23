@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { BrainCircuit, Menu, X, ChevronDown, MessageSquare, Calendar, FileText } from "lucide-react";
 import { getCompanyProfile } from "../service/companyProfileService";
@@ -10,6 +10,7 @@ const Navigation = () => {
   const [showContactDropdown, setShowContactDropdown] = useState(false);
   const [companyName, setCompanyName] = useState("Core Implementations");
   const navigate = useNavigate();
+  const dropdownTimeoutRef = useRef(null);
 
   // Load company name from Firebase
   useEffect(() => {
@@ -79,6 +80,17 @@ const Navigation = () => {
     navigate(to);
   };
 
+  const handleDropdownMouseEnter = () => {
+    clearTimeout(dropdownTimeoutRef.current);
+    setShowContactDropdown(true);
+  };
+
+  const handleDropdownMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setShowContactDropdown(false);
+    }, 200);
+  };
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -145,8 +157,8 @@ const Navigation = () => {
               {/* Contact Dropdown - Desktop */}
               <div
                 className="relative"
-                onMouseEnter={() => setShowContactDropdown(true)}
-                onMouseLeave={() => setShowContactDropdown(false)}
+                onMouseEnter={handleDropdownMouseEnter}
+                onMouseLeave={handleDropdownMouseLeave}
               >
                 <button className="relative px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-all duration-200 rounded-lg group flex items-center gap-1">
                   <span className="relative z-10">Contact</span>
